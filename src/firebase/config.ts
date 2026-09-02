@@ -2,15 +2,17 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-// Todas as chaves vêm de variáveis de ambiente (ver .env.example).
-// Nenhuma credencial fica hardcoded no repositório.
+// Configuração do projeto "clinicaalex-47cf9" no Firebase Console.
+// Essas chaves identificam o projeto publicamente e não são segredo —
+// a segurança real vem das regras do Firestore (firestore.rules) e do
+// Firebase Auth, não de esconder este objeto.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyBi2hqgw6IqvkNgsvkmjqILx5V0nI-Wogg",
+  authDomain: "clinicaalex-47cf9.firebaseapp.com",
+  projectId: "clinicaalex-47cf9",
+  storageBucket: "clinicaalex-47cf9.firebasestorage.app",
+  messagingSenderId: "523408768808",
+  appId: "1:523408768808:web:a83a23b7553d2f2cfe5a1d",
 };
 
 export const app = initializeApp(firebaseConfig);

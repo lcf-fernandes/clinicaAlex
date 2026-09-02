@@ -23,9 +23,12 @@ React + TypeScript (Vite) + Firebase (Firestore, Auth, Cloud Functions).
 
 ```bash
 npm install
-cp .env.example .env.local   # preencha com as chaves do seu projeto Firebase
 npm run dev
 ```
+
+As credenciais do Firebase (projeto `clinicaalex-47cf9`) já estão em
+`src/firebase/config.ts` — são valores públicos do SDK web, a segurança
+real fica nas regras do Firestore e no Auth.
 
 No Firebase Console, ative **Authentication → Sign-in method → E-mail/senha**
 e crie manualmente o primeiro usuário (a secretária) em
