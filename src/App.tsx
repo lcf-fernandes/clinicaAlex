@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ProfessionalsPage from "./modules/professionals/ProfessionalsPage";
 import PatientsPage from "./modules/patients/PatientsPage";
+import LoginPage from "./modules/auth/LoginPage";
+import { useAuth } from "./shared/auth/useAuth";
 
 type Section = "professionals" | "patients";
 
@@ -11,6 +13,15 @@ const SECTIONS: { key: Section; label: string }[] = [
 
 export default function App() {
   const [section, setSection] = useState<Section>("professionals");
+  const { user, loading, signIn, signOut } = useAuth();
+
+  if (loading) {
+    return <div className="app-loading">Carregando...</div>;
+  }
+
+  if (!user) {
+    return <LoginPage onSignIn={signIn} />;
+  }
 
   return (
     <div className="app-shell">
@@ -27,6 +38,12 @@ export default function App() {
             </button>
           ))}
         </nav>
+        <div className="sidebar-footer">
+          <span className="sidebar-user">{user.email}</span>
+          <button className="btn secondary" onClick={signOut}>
+            Sair
+          </button>
+        </div>
       </aside>
       <div className="main">
         {section === "professionals" && <ProfessionalsPage />}

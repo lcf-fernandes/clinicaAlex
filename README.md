@@ -10,10 +10,10 @@ pacientes, pagamentos, pacientes fixos, reemplazos e liquidação diária.
 
 ## Status
 
-Fase 1 em andamento: modelo de dados no Firestore + CRUD de
-Profissionais e Pacientes (com perfis de facturación) implementados.
-Ainda falta: Auth/login da secretária e deploy das regras/índices num
-projeto Firebase real.
+Fase 1 concluída: modelo de dados no Firestore, CRUD de Profissionais e
+Pacientes (com perfis de facturación), e login por e-mail/senha
+(Firebase Auth) protegendo o acesso. Falta: deploy num projeto Firebase
+real e criação do primeiro usuário (secretária).
 
 ## Stack
 
@@ -27,6 +27,11 @@ cp .env.example .env.local   # preencha com as chaves do seu projeto Firebase
 npm run dev
 ```
 
+No Firebase Console, ative **Authentication → Sign-in method → E-mail/senha**
+e crie manualmente o primeiro usuário (a secretária) em
+**Authentication → Users → Add user**. Depois é só entrar com esse
+e-mail/senha na tela de login do app.
+
 Para publicar as regras de segurança do Firestore (`firestore.rules`) e
 os índices, use o Firebase CLI (`firebase deploy --only firestore`)
 depois de rodar `firebase init` apontando para o projeto criado no
@@ -37,9 +42,12 @@ Console.
 ```
 src/
   firebase/        # inicialização do app Firebase (usa .env)
-  shared/firestore/ # helpers genéricos de CRUD/subscribe
+  shared/
+    auth/           # hook useAuth (login/logout/estado)
+    firestore/       # helpers genéricos de CRUD/subscribe
   types/            # tipos de domínio (Professional, Patient, ...)
   modules/
-    professionals/  # listagem + formulário de profissionais
-    patients/       # listagem + formulário de pacientes
+    auth/            # tela de login
+    professionals/    # listagem + formulário de profissionais
+    patients/         # listagem + formulário de pacientes
 ```
