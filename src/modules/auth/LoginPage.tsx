@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 interface Props {
-  onSignIn: (email: string, password: string) => Promise<void>;
+  onSignIn: (username: string, password: string) => Promise<void>;
 }
 
 export default function LoginPage({ onSignIn }: Props) {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -15,9 +15,9 @@ export default function LoginPage({ onSignIn }: Props) {
     setLoading(true);
     setError(null);
     try {
-      await onSignIn(email.trim(), password);
+      await onSignIn(username.trim(), password);
     } catch {
-      setError("E-mail ou senha inválidos.");
+      setError("Usuário ou senha inválidos.");
     } finally {
       setLoading(false);
     }
@@ -32,13 +32,13 @@ export default function LoginPage({ onSignIn }: Props) {
         {error && <div className="error-banner">{error}</div>}
 
         <div className="field">
-          <label htmlFor="email">E-mail</label>
+          <label htmlFor="username">Usuário</label>
           <input
-            id="email"
-            type="email"
+            id="username"
+            type="text"
             autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

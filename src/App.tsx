@@ -13,7 +13,7 @@ const SECTIONS: { key: Section; label: string }[] = [
 
 export default function App() {
   const [section, setSection] = useState<Section>("professionals");
-  const { user, loading, signIn, signOut } = useAuth();
+  const { user, profile, loading, signIn, signOut } = useAuth();
 
   if (loading) {
     return <div className="app-loading">Carregando...</div>;
@@ -39,7 +39,10 @@ export default function App() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <span className="sidebar-user">{user.email}</span>
+          <span className="sidebar-user">
+            {profile?.username ?? user.email}
+            {profile && <span className="sidebar-role"> · {profile.role === "admin" ? "Administrador" : "Secretaria"}</span>}
+          </span>
           <button className="btn secondary" onClick={signOut}>
             Sair
           </button>

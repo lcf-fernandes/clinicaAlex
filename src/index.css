@@ -72,6 +72,10 @@ input, select, textarea {
   white-space: nowrap;
 }
 
+.sidebar-role {
+  color: var(--text-muted);
+}
+
 .app-loading {
   display: flex;
   align-items: center;
