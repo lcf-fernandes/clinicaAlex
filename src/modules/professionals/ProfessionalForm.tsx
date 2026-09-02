@@ -1,0 +1,186 @@
+import { useState } from "react";
+import {
+  WEEKDAYS,
+  type Professional,
+  type ProfessionalInput,
+  type Weekday,
+  type WeeklySchedule,
+} from "../../types/professional";
+
+interface Props {
+  initial?: Professional;
+  onSave: (input: ProfessionalInput) => Promise<void>;
+  onCancel: () => void;
+}
+
+const EMPTY_SCHEDULE: WeeklySchedule = {};
+
+export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
+  const [name, setName] = useState(initial?.name ?? "");
+  const [active, setActive] = useState(initial?.active ?? true);
+  const [sessionRate, setSessionRate] = useState(initial?.sessionRate ?? 0);
+  const [roomCost, setRoomCost] = useState(initial?.roomCost ?? 0);
+  const [perSessionFee, setPerSessionFee] = useState(initial?.perSessionFee ?? 0);
+  const [schedule, setSchedule] = useState<WeeklySchedule>(
+    initial?.defaultSchedule ?? EMPTY_SCHEDULE
+  );
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function toggleDay(day: Weekday, enabled: boolean) {
+    setSchedule((prev) => {
+      const next = { ...prev };
+      if (enabled) {
+        next[day] = next[day] ?? { start: "08:00", end: "17:00", room: "" };
+      } else {
+        delete next[day];
+      }
+      return next;
+    });
+  }
+
+  function updateDay(day: Weekday, field: "start" | "end" | "room", value: string) {
+    setSchedule((prev) => ({
+      ...prev,
+      [day]: { ...(prev[day] ?? { start: "08:00", end: "17:00", room: "" }), [field]: value },
+    }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError("Informe o nome do profissional.");
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      await onSave({
+        name: name.trim(),
+        active,
+        sessionRate: Number(sessionRate) || 0,
+        roomCost: Number(roomCost) || 0,
+        perSessionFee: Number(perSessionFee) || 0,
+        defaultSchedule: schedule,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="panel" onSubmit={handleSubmit}>
+      <h2>{initial ? "Editar profissional" : "Novo profissional"}</h2>
+      {error && <div className="error-banner">{error}</div>}
+
+      <div className="field">
+        <label htmlFor="name">Nome</label>
+        <input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ex.: Alicia"
+        />
+      </div>
+
+      <div className="field">
+        <label>
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+            style={{ width: "auto", marginRight: 6 }}
+          />
+          Ativo
+        </label>
+      </div>
+
+      <div className="field-row">
+        <div className="field">
+          <label htmlFor="sessionRate">Valor por sessão (Gs)</label>
+          <input
+            id="sessionRate"
+            type="number"
+            min={0}
+            value={sessionRate}
+            onChange={(e) => setSessionRate(Number(e.target.value))}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="roomCost">Custo de sala/dia (Gs)</label>
+          <input
+            id="roomCost"
+            type="number"
+            min={0}
+            value={roomCost}
+            onChange={(e) => setRoomCost(Number(e.target.value))}
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="perSessionFee">Taxa por sessão (Gs)</label>
+          <input
+            id="perSessionFee"
+            type="number"
+            min={0}
+            value={perSessionFee}
+            onChange={(e) => setPerSessionFee(Number(e.target.value))}
+          />
+        </div>
+      </div>
+
+      <div className="field">
+        <label>Escala semanal habitual</label>
+        <div className="schedule-grid">
+          {WEEKDAYS.map(({ key, label }) => {
+            const day = schedule[key];
+            const enabled = Boolean(day);
+            return (
+              <div className="schedule-day" key={key}>
+                <label style={{ marginBottom: 0 }}>
+                  <input
+                    type="checkbox"
+                    checked={enabled}
+                    onChange={(e) => toggleDay(key, e.target.checked)}
+                    style={{ width: "auto", marginRight: 6 }}
+                  />
+                  {label}
+                </label>
+                <input
+                  type="time"
+                  disabled={!enabled}
+                  value={day?.start ?? ""}
+                  onChange={(e) => updateDay(key, "start", e.target.value)}
+                />
+                <input
+                  type="time"
+                  disabled={!enabled}
+                  value={day?.end ?? ""}
+                  onChange={(e) => updateDay(key, "end", e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Sala"
+                  disabled={!enabled}
+                  value={day?.room ?? ""}
+                  onChange={(e) => updateDay(key, "room", e.target.value)}
+                />
+                <span />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="form-actions">
+        <button type="submit" className="btn" disabled={saving}>
+          {saving ? "Salvando..." : "Salvar"}
+        </button>
+        <button type="button" className="btn secondary" onClick={onCancel}>
+          Cancelar
+        </button>
+      </div>
+    </form>
+  );
+}
