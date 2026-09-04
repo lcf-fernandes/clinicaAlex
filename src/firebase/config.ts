@@ -16,6 +16,17 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+const missing = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missing.length > 0) {
+  throw new Error(
+    `Variáveis de ambiente do firebase (VITE_FIREBASE_*) ausentes: ${missing.join(", ")}. ` +
+      "Confira o .env.local (local) ou as Environment Variables do projeto na Vercel."
+  );
+}
+
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
