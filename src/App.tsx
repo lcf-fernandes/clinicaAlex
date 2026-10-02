@@ -1,10 +1,11 @@
 import { useState } from "react";
 import ProfessionalsPage from "./modules/professionals/ProfessionalsPage";
 import PatientsPage from "./modules/patients/PatientsPage";
+import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
 import { useAuth } from "./shared/auth/useAuth";
 
-type Section = "professionals" | "patients";
+type Section = "professionals" | "patients" | "users";
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "professionals", label: "Profissionais" },
@@ -23,12 +24,15 @@ export default function App() {
     return <LoginPage onSignIn={signIn} />;
   }
 
+  const isAdmin = profile?.role === "admin";
+  const sections = isAdmin ? [...SECTIONS, { key: "users" as const, label: "Usuários" }] : SECTIONS;
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <h1>Clínica Alex</h1>
         <nav>
-          {SECTIONS.map((s) => (
+          {sections.map((s) => (
             <button
               key={s.key}
               className={s.key === section ? "active" : ""}
@@ -51,6 +55,7 @@ export default function App() {
       <div className="main">
         {section === "professionals" && <ProfessionalsPage />}
         {section === "patients" && <PatientsPage />}
+        {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
       </div>
     </div>
   );

@@ -12,9 +12,22 @@ pacientes, pagamentos, pacientes fixos, reemplazos e liquidação diária.
 
 Fase 1 concluída: modelo de dados no Firestore, CRUD de Profissionais e
 Pacientes (com perfis de facturación), login por **usuário**/senha
-(Firebase Auth por trás de um mapeamento usuário → e-mail sintético) e
-perfis de usuário com papel (`admin` / `secretary`) e permissões
-granulares preparadas para uso futuro.
+(Firebase Auth + lookup usuário→e-mail no Firestore) e controle de
+acesso por papel: só `admin` vê o painel **Usuários**, onde pode
+bloquear/desbloquear ou apagar o acesso de uma secretária (uma
+secretária não vê nem consegue mexer em contas de ninguém — nem as de
+outras secretarias).
+
+> **Pendente, documentado mas não implementado:** "Apagar" no painel
+> Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
+> em `usernames/{username}`), mas a credencial em si no **Firebase
+> Authentication** continua existindo — excluí-la também exige o Admin
+> SDK, que só funciona em back-end (Cloud Function), não no app React
+> rodando no navegador. Pra automatizar isso: criar uma Cloud Function
+> callable (`deleteUserAccount`), chamável só por quem tem `role ==
+> 'admin'`, que chama `admin.auth().deleteUser(uid)`. Até lá, remover a
+> credencial de verdade é um passo manual: Console → Authentication →
+> Users → excluir a linha correspondente.
 
 ## Stack
 

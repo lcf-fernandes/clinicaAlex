@@ -6,13 +6,28 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function myData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function role() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return myData().role;
+    }
+
+    // Conta bloqueada (ou apagada, nesse caso myData() já falha e isso
+    // nunca chega a ser avaliado) perde acesso aos dados na hora,
+    // mesmo com uma sessão do Authentication ainda válida no navegador.
+    function isActive() {
+      return myData().active == true;
+    }
+
+    function isAuthorized() {
+      return isSignedIn() && isActive();
     }
 
     // Cada usuário lê o próprio perfil (username, role, permissions);
-    // um admin lê todos. Só admin pode criar/editar/remover usuários —
-    // isso é feito manualmente pelo Firebase Console por enquanto.
+    // um admin lê todos. Só admin pode criar/editar/apagar usuários —
+    // é o painel "Usuários" do app (bloquear/desbloquear/apagar).
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || role() == 'admin');
       allow write: if isSignedIn() && role() == 'admin';
@@ -21,23 +36,22 @@ service cloud.firestore {
     // Lookup público usuário -> e-mail, usado só pra resolver o e-mail
     // ANTES do login (ainda sem sessão). Guarda só {email, uid} — nada
     // de role/active/permissions aqui, isso fica em users/{uid}.
-    // Escrita só por admin (criação de usuário continua manual por
-    // enquanto).
+    // Escrita só por admin (acompanha a criação/remoção de usuários).
     match /usernames/{username} {
       allow read: if true;
       allow write: if isSignedIn() && role() == 'admin';
     }
 
-    // Fase 1: qualquer usuário autenticado (secretária ou admin) pode
-    // ler/escrever. Quando entrarmos em permissões por seção (ver
-    // UserPermissions em src/types/user.ts), cada coleção sensível
-    // passa a checar role()/permissions() aqui.
+    // Qualquer usuário autenticado E ativo (secretária ou admin) pode
+    // ler/escrever. Uma secretária lida com profissionais e pacientes,
+    // mas não com contas de outras secretarias (isso fica só em
+    // /users, restrito a admin acima).
     match /professionals/{id} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isAuthorized();
     }
 
     match /patients/{id} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isAuthorized();
     }
   }
 }
