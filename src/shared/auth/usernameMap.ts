@@ -1,22 +1,17 @@
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
+
 /**
  * O Firebase Auth exige e-mail/senha; como a secretária pensa em termos
- * de "usuário", mapeamos usuário → e-mail aqui (o mesmo e-mail cadastrado
- * na conta em Authentication → Users). Isso não é dado sensível em si
- * (só o vínculo usuário → e-mail, nunca a senha), então pode ficar
- * versionado — mas como são e-mails reais aqui, considere usar um
- * endereço sintético (ex.: usuario@clinicaalex.local) se preferir não
- * deixá-los visíveis no repositório.
- *
- * Pra adicionar um novo usuário: criar a conta no Firebase Console
- * (Authentication → Users) com o e-mail correspondente, mais o
- * documento em `users/{uid}` (ver src/types/user.ts), e adicionar a
- * entrada aqui.
+ * de "usuário", resolvemos usuário → e-mail buscando na coleção
+ * `usernames/{username}` do Firestore (leitura pública, só com
+ * {email, uid} — ver firestore.rules). Assim, criar um usuário novo
+ * não exige alterar o código: só criar a conta no Authentication, o
+ * documento em `users/{uid}` (papel/permissões) e o documento em
+ * `usernames/{username}` (ver README).
  */
-export const USERNAME_TO_EMAIL: Record<string, string> = {
-  Overlord: "leandrowebmaster@gmail.com",
-  Sec1: "atreidesthe@gmail.com",
-};
-
-export function resolveEmailFromUsername(username: string): string | null {
-  return USERNAME_TO_EMAIL[username] ?? null;
+export async function resolveEmailFromUsername(username: string): Promise<string | null> {
+  const snap = await getDoc(doc(db, "usernames", username));
+  if (!snap.exists()) return null;
+  return (snap.data().email as string) ?? null;
 }

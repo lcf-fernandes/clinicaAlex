@@ -48,7 +48,7 @@ export function useAuth() {
   }
 
   async function signIn(username: string, password: string) {
-    const email = resolveEmailFromUsername(username.trim());
+    const email = await resolveEmailFromUsername(username.trim());
     if (!email) {
       throw new Error("Usuário ou senha inválidos.");
     }

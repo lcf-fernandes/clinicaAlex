@@ -52,17 +52,24 @@ vem de dois lugares:
 
 ## Usuários
 
-Autenticação é por **usuário** (não e-mail) — o app mapeia usuário →
-e-mail sintético internamente (`src/shared/auth/usernameMap.ts`). Cada
-conta tem dois lugares:
+Autenticação é por **usuário** (não e-mail) — o app resolve usuário →
+e-mail consultando o Firestore em tempo real (`src/shared/auth/usernameMap.ts`),
+não um mapa fixo no código. Criar um usuário novo não exige deploy:
+basta criar os três registros abaixo pelo Console. O `uid` usado nos
+passos 2 e 3 tem que ser exatamente o UID gerado no passo 1.
 
-1. **Firebase Auth** — a credencial de login em si (Console →
-   Authentication → Users → Add user), usando o e-mail sintético
-   correspondente.
+1. **Firebase Auth** (Console → Authentication → Users → Add user) —
+   e-mail e senha reais da conta.
 2. **Firestore `users/{uid}`** — o perfil com `username`, `role`
-   (`admin` ou `secretary`) e `permissions` (ver `src/types/user.ts`).
-   O `uid` do documento tem que ser exatamente o UID gerado pelo Auth
-   no passo 1.
+   (`admin` ou `secretary`), `active` (boolean) e opcionalmente
+   `permissions` (ver `src/types/user.ts`). Protegido por regras: só o
+   próprio usuário ou um admin lê; só admin escreve.
+3. **Firestore `usernames/{username}`** — documento com ID igual ao
+   texto que a pessoa digita no campo "Usuário" (ex.: `Overlord`),
+   contendo `{ email: "<mesmo e-mail do passo 1>", uid: "<uid>" }`.
+   Essa coleção é de **leitura pública** (precisa ser consultada antes
+   do login, quando ainda não há sessão) — por isso só guarda o
+   vínculo usuário→e-mail, nunca papel/permissões.
 
 Nenhuma senha fica no código ou no histórico do git — são criadas
 manualmente no Console.

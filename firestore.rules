@@ -18,6 +18,16 @@ service cloud.firestore {
       allow write: if isSignedIn() && role() == 'admin';
     }
 
+    // Lookup público usuário -> e-mail, usado só pra resolver o e-mail
+    // ANTES do login (ainda sem sessão). Guarda só {email, uid} — nada
+    // de role/active/permissions aqui, isso fica em users/{uid}.
+    // Escrita só por admin (criação de usuário continua manual por
+    // enquanto).
+    match /usernames/{username} {
+      allow read: if true;
+      allow write: if isSignedIn() && role() == 'admin';
+    }
+
     // Fase 1: qualquer usuário autenticado (secretária ou admin) pode
     // ler/escrever. Quando entrarmos em permissões por seção (ver
     // UserPermissions em src/types/user.ts), cada coleção sensível
