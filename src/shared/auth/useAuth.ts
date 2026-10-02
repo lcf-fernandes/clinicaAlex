@@ -32,10 +32,15 @@ export function useAuth() {
     const snap = await getDoc(doc(db, "users", uid));
     if (!snap.exists()) return null;
     const data = snap.data();
-    const role = (data.role as UserProfile["role"]) ?? "secretary";
+    // Tolera variações de quem cadastrou o documento manualmente no
+    // Console: "name" além de "username", e "secretaria"/"secretário"
+    // além de "secretary".
+    const username = (data.username as string) ?? (data.name as string) ?? "";
+    const rawRole = String(data.role ?? "secretary").toLowerCase();
+    const role: UserProfile["role"] = rawRole.startsWith("admin") ? "admin" : "secretary";
     return {
       uid,
-      username: (data.username as string) ?? "",
+      username,
       role,
       permissions: (data.permissions as UserProfile["permissions"]) ?? DEFAULT_PERMISSIONS[role],
       active: (data.active as boolean) ?? true,
@@ -47,7 +52,24 @@ export function useAuth() {
     if (!email) {
       throw new Error("Usuário ou senha inválidos.");
     }
-    await signInWithEmailAndPassword(auth, email, password);
+
+    // 1. Autentica no Firebase
+    const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    // 2/3. Busca o cadastro correspondente no Firestore (users/{uid})
+    const loadedProfile = await loadProfile(credential.user.uid);
+
+    // 4. Sem cadastro ou usuário desativado: desfaz o login e avisa
+    if (!loadedProfile) {
+      await firebaseSignOut(auth);
+      throw new Error("Usuário não possui cadastro no sistema.");
+    }
+    if (!loadedProfile.active) {
+      await firebaseSignOut(auth);
+      throw new Error("Usuário desativado.");
+    }
+    // onAuthStateChanged (acima) vai disparar em seguida e preencher
+    // `user`/`profile` normalmente, então não precisamos repetir aqui.
   }
 
   async function signOut() {

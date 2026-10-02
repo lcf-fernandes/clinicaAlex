@@ -16,8 +16,19 @@ export default function LoginPage({ onSignIn }: Props) {
     setError(null);
     try {
       await onSignIn(username.trim(), password);
-    } catch {
-      setError("Usuário ou senha inválidos.");
+    } catch (err) {
+      // Erros do próprio Firebase Auth (senha errada, etc.) ficam com
+      // mensagem genérica, pra não revelar se o usuário existe. Já os
+      // erros que nós mesmos lançamos (sem cadastro / desativado) têm
+      // mensagem específica e podem ser mostrados.
+      const isFirebaseAuthError =
+        typeof err === "object" && err !== null && "code" in err &&
+        String((err as { code: unknown }).code).startsWith("auth/");
+      setError(
+        isFirebaseAuthError || !(err instanceof Error)
+          ? "Usuário ou senha inválidos."
+          : err.message
+      );
     } finally {
       setLoading(false);
     }
