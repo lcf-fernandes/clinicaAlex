@@ -2,30 +2,21 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-// As chaves do SDK web do Firebase não são segredo por natureza — a
-// proteção real vem das regras do Firestore/Auth e da restrição do
-// apiKey no Google Cloud Console (ver README). Ainda assim, usamos
-// variáveis de ambiente para não deixar um valor fixo no código-fonte,
-// e para poder trocar de projeto (dev/prod) sem editar este arquivo.
+// Configuração do projeto "clinicaalex-47cf9" no Firebase Console,
+// fixa no código para não depender de Environment Variables na Vercel
+// (histórico: chegou a causar tela em branco por falta delas lá).
+// Essas chaves identificam o projeto publicamente e não são segredo —
+// a segurança real vem das regras do Firestore (firestore.rules), do
+// Firebase Auth e da restrição do apiKey no Google Cloud Console (ver
+// README), não de esconder este objeto.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyBi2hqgw6IqvkNgsvkmjqILx5V0nI-Wogg",
+  authDomain: "clinicaalex-47cf9.firebaseapp.com",
+  projectId: "clinicaalex-47cf9",
+  storageBucket: "clinicaalex-47cf9.firebasestorage.app",
+  messagingSenderId: "523408768808",
+  appId: "1:523408768808:web:a83a23b7553d2f2cfe5a1d",
 };
-
-const missing = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-if (missing.length > 0) {
-  throw new Error(
-    `Variáveis de ambiente do firebase (VITE_FIREBASE_*) ausentes: ${missing.join(", ")}. ` +
-      "Confira o .env.local (local) ou as Environment Variables do projeto na Vercel."
-  );
-}
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);

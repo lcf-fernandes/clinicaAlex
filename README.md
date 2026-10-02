@@ -24,14 +24,15 @@ React + TypeScript (Vite) + Firebase (Firestore, Auth, Cloud Functions).
 
 ```bash
 npm install
-cp .env.example .env.local   # preencha com as chaves do projeto clinicaalex-47cf9
 npm run dev
 ```
 
-As chaves do SDK web do Firebase (`apiKey` etc.) não são segredo por
-natureza — qualquer app Firebase as expõe no bundle do navegador. Ainda
-assim ficam em `.env.local` (fora do git) por organização, e a proteção
-de verdade vem de dois lugares:
+As credenciais do Firebase (projeto `clinicaalex-47cf9`) já estão fixas
+em `src/firebase/config.ts` — não é preciso configurar nenhum `.env`
+pra rodar local ou na Vercel. As chaves do SDK web do Firebase
+(`apiKey` etc.) não são segredo por natureza — qualquer app Firebase as
+expõe no bundle do navegador de qualquer forma. A proteção de verdade
+vem de dois lugares:
 
 1. **Regras do Firestore** (`firestore.rules`) — só usuário autenticado
    acessa dados; a coleção `users` só é editável por `admin`.
@@ -75,7 +76,7 @@ Console.
 
 ```
 src/
-  firebase/        # inicialização do app Firebase (usa .env)
+  firebase/        # inicialização do app Firebase (config fixa)
   shared/
     auth/           # useAuth (login/logout/estado) + mapa usuário→e-mail
     firestore/       # helpers genéricos de CRUD/subscribe
