@@ -4,6 +4,7 @@ import { useProfessionals } from "../professionals/useProfessionals";
 import { WEEKDAYS, type Weekday } from "../../types/professional";
 import type { RecurringRule, RecurringRuleInput } from "../../types/recurringRule";
 import { todayISO } from "../../shared/date";
+import { timeToMinutes } from "../../types/session";
 
 interface Props {
   initial?: RecurringRule;
@@ -25,7 +26,28 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const activeProfessionals = useMemo(() => professionals.filter((p) => p.active), [professionals]);
+  // Só profissionais ativos que trabalham nesse dia da semana E cujo
+  // expediente cobre o horário escolhido — evita cadastrar um fixo num
+  // horário em que o profissional nem está na clínica.
+  const availableProfessionals = useMemo(() => {
+    const timeMin = timeToMinutes(time);
+    return professionals.filter((p) => {
+      if (!p.active) return false;
+      const sched = p.defaultSchedule[weekday];
+      if (!sched) return false;
+      return timeMin >= timeToMinutes(sched.start) && timeMin < timeToMinutes(sched.end);
+    });
+  }, [professionals, weekday, time]);
+
+  function handleWeekdayChange(value: Weekday) {
+    setWeekday(value);
+    setProfessionalId("");
+  }
+
+  function handleTimeChange(value: string) {
+    setTime(value);
+    setProfessionalId("");
+  }
 
   const patientMatches = useMemo(() => {
     const term = patientSearch.trim().toLowerCase();
@@ -112,7 +134,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
       <div className="field-row">
         <div className="field">
           <label htmlFor="weekday">Dia da semana</label>
-          <select id="weekday" value={weekday} onChange={(e) => setWeekday(e.target.value as Weekday)}>
+          <select id="weekday" value={weekday} onChange={(e) => handleWeekdayChange(e.target.value as Weekday)}>
             {WEEKDAYS.map((w) => (
               <option key={w.key} value={w.key}>
                 {w.label}
@@ -122,7 +144,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
         </div>
         <div className="field">
           <label htmlFor="time">Horário</label>
-          <input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+          <input id="time" type="time" value={time} onChange={(e) => handleTimeChange(e.target.value)} />
         </div>
       </div>
 
@@ -134,12 +156,18 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
           onChange={(e) => setProfessionalId(e.target.value)}
         >
           <option value="">— selecione —</option>
-          {activeProfessionals.map((p) => (
+          {availableProfessionals.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>
           ))}
         </select>
+        {availableProfessionals.length === 0 && (
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+            Nenhum profissional disponível nesse dia/horário — ajuste a escala em Profissionais ou
+            escolha outro horário.
+          </span>
+        )}
       </div>
 
       {selectedPatient && selectedPatient.billingProfiles.length > 0 && (
