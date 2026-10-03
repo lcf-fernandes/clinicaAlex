@@ -10,13 +10,21 @@ pacientes, pagamentos, pacientes fixos, reemplazos e liquidação diária.
 
 ## Status
 
-Fase 1 concluída: modelo de dados no Firestore, CRUD de Profissionais e
-Pacientes (com perfis de facturación), login por **usuário**/senha
-(Firebase Auth + lookup usuário→e-mail no Firestore) e controle de
-acesso por papel: só `admin` vê o painel **Usuários**, onde pode
-bloquear/desbloquear ou apagar o acesso de uma secretária (uma
-secretária não vê nem consegue mexer em contas de ninguém — nem as de
-outras secretarias).
+**Fase 1** concluída: modelo de dados no Firestore, CRUD de
+Profissionais e Pacientes (com perfis de facturación), login por
+**usuário**/senha (Firebase Auth + lookup usuário→e-mail no Firestore)
+e controle de acesso por papel: só `admin` vê o painel **Usuários**,
+onde pode bloquear/desbloquear ou apagar o acesso de uma secretária
+(uma secretária não vê nem consegue mexer em contas de ninguém — nem
+as de outras secretarias).
+
+**Fase 2** concluída: tela de **Agenda** — grade diária com uma coluna
+por profissional escalado naquele dia da semana (conforme
+`defaultSchedule`), navegação entre dias, clique num horário livre
+abre o formulário de nova sessão (busca de paciente, duração 60/120
+min, status, pagamento), clique numa sessão existente permite editar
+ou remover, bloqueio de horário por profissional, e validação de
+conflito (não deixa sobrepor sessão/bloqueio já existente).
 
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
@@ -98,11 +106,14 @@ Console.
 src/
   firebase/        # inicialização do app Firebase (config fixa)
   shared/
-    auth/           # useAuth (login/logout/estado) + mapa usuário→e-mail
+    auth/           # useAuth (login/logout/estado) + lookup usuário→e-mail
     firestore/       # helpers genéricos de CRUD/subscribe
-  types/            # tipos de domínio (Professional, Patient, User, ...)
+    date.ts           # utilitários de data (ISO, dia da semana, navegação)
+  types/            # tipos de domínio (Professional, Patient, Session, User, ...)
   modules/
     auth/            # tela de login
+    agenda/           # grade diária, criação/edição de sessão, bloqueios
     professionals/    # listagem + formulário de profissionais
     patients/         # listagem + formulário de pacientes
+    users/            # painel de usuários (admin)
 ```

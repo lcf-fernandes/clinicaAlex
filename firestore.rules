@@ -53,5 +53,14 @@ service cloud.firestore {
     match /patients/{id} {
       allow read, write: if isAuthorized();
     }
+
+    // Agenda: sessões agendadas e bloqueios de horário de cada dia.
+    match /sessions/{id} {
+      allow read, write: if isAuthorized();
+    }
+
+    match /blocks/{id} {
+      allow read, write: if isAuthorized();
+    }
   }
 }

@@ -1,19 +1,21 @@
 import { useState } from "react";
+import AgendaPage from "./modules/agenda/AgendaPage";
 import ProfessionalsPage from "./modules/professionals/ProfessionalsPage";
 import PatientsPage from "./modules/patients/PatientsPage";
 import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
 import { useAuth } from "./shared/auth/useAuth";
 
-type Section = "professionals" | "patients" | "users";
+type Section = "agenda" | "professionals" | "patients" | "users";
 
 const SECTIONS: { key: Section; label: string }[] = [
+  { key: "agenda", label: "Agenda" },
   { key: "professionals", label: "Profissionais" },
   { key: "patients", label: "Pacientes" },
 ];
 
 export default function App() {
-  const [section, setSection] = useState<Section>("professionals");
+  const [section, setSection] = useState<Section>("agenda");
   const { user, profile, loading, signIn, signOut } = useAuth();
 
   if (loading) {
@@ -53,6 +55,7 @@ export default function App() {
         </div>
       </aside>
       <div className="main">
+        {section === "agenda" && <AgendaPage />}
         {section === "professionals" && <ProfessionalsPage />}
         {section === "patients" && <PatientsPage />}
         {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
