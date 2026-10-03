@@ -56,6 +56,21 @@ não apaga nada, o histórico de sessões já geradas continua intacto.
 > real no back-end fica junto com a Cloud Function de exclusão de
 > usuário, já documentada acima.
 
+**Fase 5** concluída: **reemplazo de profissionais** (item 11 da
+especificação). "+ Profissional ausente" marca alguém ausente num dia
+específico, com reemplazo opcional — o reemplazo aparece na grade
+daquele dia usando o horário do profissional ausente (ou a união dos
+dois horários, se o reemplazo já trabalhava nesse dia por conta
+própria). A coluna do ausente some da grade; em vez disso aparece um
+banner no topo listando os pacientes que já estavam agendados com
+ele(a), paciente por paciente, com três opções — **transferir** pra
+qualquer profissional ativo (não só o reemplazo sugerido), **cancelar
+a sessão**, ou simplesmente deixar pendente pra decidir depois. Uma
+sessão transferida guarda `scheduledProfessionalId`/`Name` (quem era o
+profissional habitual) além de `professionalId`/`Name` (quem atendeu
+de fato) — ambos os dados ficam preservados pra quando a liquidação
+(Fase 7) for implementada.
+
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
 > em `usernames/{username}`), mas a credencial em si no **Firebase
@@ -142,7 +157,7 @@ src/
   types/            # tipos de domínio (Professional, Patient, Session, User, ...)
   modules/
     auth/            # tela de login
-    agenda/           # grade diária, criação/edição de sessão, bloqueios
+    agenda/           # grade diária, criação/edição de sessão, bloqueios, ausência/reemplazo
     professionals/    # listagem + formulário de profissionais
     patients/         # listagem + formulário + histórico de sessões do paciente
     recurring/         # pacientes fixos: regra + exceções por data

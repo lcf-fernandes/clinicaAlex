@@ -68,5 +68,10 @@ service cloud.firestore {
     match /recurringRules/{id} {
       allow read, write: if isAuthorized();
     }
+
+    // Ausência/reemplazo pontual de um profissional num dia.
+    match /scheduleExceptions/{id} {
+      allow read, write: if isAuthorized();
+    }
   }
 }

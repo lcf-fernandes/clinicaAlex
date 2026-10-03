@@ -22,6 +22,9 @@ export interface Session {
   notes?: string;
   /** Presente quando a sessão foi gerada a partir de um paciente fixo (ver src/types/recurringRule.ts). */
   recurringRuleId?: string;
+  /** Presente quando a sessão foi transferida num reemplazo (item 11) — quem era o profissional habitual antes da troca. */
+  scheduledProfessionalId?: string;
+  scheduledProfessionalName?: string;
   createdAt: number;
   updatedAt: number;
 }

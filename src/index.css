@@ -529,3 +529,45 @@ button.agenda-cell {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Ausência / reemplazo */
+.absence-banner {
+  background: #fbeae7;
+  border: 1px solid #f0c9c2;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.absence-banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.absence-session-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.absence-session-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+}
+
+.absence-session-row select {
+  font-size: 12px;
+  padding: 3px 5px;
+}
+
+.absence-session-row button {
+  font-size: 12px;
+  padding: 3px 7px;
+}

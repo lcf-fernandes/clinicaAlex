@@ -3,9 +3,12 @@ import { useProfessionals } from "../professionals/useProfessionals";
 import { useRecurringRules } from "../recurring/useRecurringRules";
 import { useSessions } from "./useSessions";
 import { useBlocks } from "./useBlocks";
+import { useScheduleExceptions } from "./useScheduleExceptions";
 import { useAutoGenerateRecurringSessions } from "./useAutoGenerateRecurringSessions";
 import SessionModal from "./SessionModal";
 import BlockModal from "./BlockModal";
+import AbsenceModal from "./AbsenceModal";
+import AbsentProfessionalBanner from "./AbsentProfessionalBanner";
 import { addDays, formatLongDate, todayISO, weekdayOf } from "../../shared/date";
 import { minutesToTime, timeToMinutes, STATUS_LABELS, type Session, type Block } from "../../types/session";
 import type { Professional } from "../../types/professional";
@@ -16,6 +19,11 @@ interface SessionModalState {
   existing?: Session;
 }
 
+interface Column {
+  professional: Professional;
+  schedule: { start: string; end: string };
+}
+
 export default function AgendaPage() {
   const [date, setDate] = useState(todayISO());
   const { professionals, loading: loadingProfessionals } = useProfessionals();
@@ -23,9 +31,16 @@ export default function AgendaPage() {
     useSessions(date);
   const { blocks, loading: loadingBlocks, error: blocksError, addBlock, removeBlock } = useBlocks(date);
   const { rules, loading: loadingRules } = useRecurringRules();
+  const {
+    exceptions,
+    loading: loadingExceptions,
+    addException,
+    removeException,
+  } = useScheduleExceptions(date);
 
   const [sessionModal, setSessionModal] = useState<SessionModalState | null>(null);
   const [blockModal, setBlockModal] = useState(false);
+  const [absenceModal, setAbsenceModal] = useState(false);
 
   const weekday = weekdayOf(date);
 
@@ -41,7 +56,7 @@ export default function AgendaPage() {
     addSession,
   });
 
-  const workingProfessionals = useMemo(
+  const scheduledProfessionals = useMemo(
     () =>
       professionals
         .filter((p) => p.active && p.defaultSchedule[weekday])
@@ -49,21 +64,58 @@ export default function AgendaPage() {
     [professionals, weekday]
   );
 
+  const absentIds = useMemo(() => new Set(exceptions.map((e) => e.professionalId)), [exceptions]);
+
+  const columns = useMemo<Column[]>(() => {
+    const result: Column[] = [];
+    const byId = new Map<string, Column>();
+
+    scheduledProfessionals
+      .filter((p) => !absentIds.has(p.id))
+      .forEach((p) => {
+        const col: Column = { professional: p, schedule: p.defaultSchedule[weekday]! };
+        result.push(col);
+        byId.set(p.id, col);
+      });
+
+    exceptions.forEach((ex) => {
+      if (!ex.replacementProfessionalId) return;
+      const replacement = professionals.find((p) => p.id === ex.replacementProfessionalId);
+      if (!replacement || !replacement.active) return;
+      const absentProfessional = professionals.find((p) => p.id === ex.professionalId);
+      const absentSchedule = absentProfessional?.defaultSchedule[weekday];
+      if (!absentSchedule) return;
+
+      const existingCol = byId.get(replacement.id);
+      if (existingCol) {
+        existingCol.schedule = {
+          start: minutesToTime(Math.min(timeToMinutes(existingCol.schedule.start), timeToMinutes(absentSchedule.start))),
+          end: minutesToTime(Math.max(timeToMinutes(existingCol.schedule.end), timeToMinutes(absentSchedule.end))),
+        };
+      } else {
+        const col: Column = { professional: replacement, schedule: absentSchedule };
+        result.push(col);
+        byId.set(replacement.id, col);
+      }
+    });
+
+    return result.sort((a, b) => a.professional.name.localeCompare(b.professional.name));
+  }, [scheduledProfessionals, absentIds, exceptions, professionals, weekday]);
+
   const slots = useMemo(() => {
-    if (workingProfessionals.length === 0) return [];
+    if (columns.length === 0) return [];
     let minStart = Infinity;
     let maxEnd = -Infinity;
-    workingProfessionals.forEach((p) => {
-      const sched = p.defaultSchedule[weekday]!;
-      minStart = Math.min(minStart, timeToMinutes(sched.start));
-      maxEnd = Math.max(maxEnd, timeToMinutes(sched.end));
+    columns.forEach((col) => {
+      minStart = Math.min(minStart, timeToMinutes(col.schedule.start));
+      maxEnd = Math.max(maxEnd, timeToMinutes(col.schedule.end));
     });
     const result: string[] = [];
     for (let t = minStart; t < maxEnd; t += 30) result.push(minutesToTime(t));
     return result;
-  }, [workingProfessionals, weekday]);
+  }, [columns]);
 
-  const loading = loadingProfessionals || loadingSessions || loadingBlocks;
+  const loading = loadingProfessionals || loadingSessions || loadingBlocks || loadingExceptions;
 
   function openCreate(professional: Professional, startTime: string) {
     setSessionModal({ professional, startTime });
@@ -77,6 +129,19 @@ export default function AgendaPage() {
     if (confirm(`Remover o bloqueio${block.reason ? ` "${block.reason}"` : ""}?`)) {
       await removeBlock(block.id);
     }
+  }
+
+  async function handleReassign(session: Session, targetId: string, targetName: string) {
+    await updateSession(session.id, {
+      professionalId: targetId,
+      professionalName: targetName,
+      scheduledProfessionalId: session.scheduledProfessionalId ?? session.professionalId,
+      scheduledProfessionalName: session.scheduledProfessionalName ?? session.professionalName,
+    });
+  }
+
+  async function handleCancelSession(session: Session) {
+    await updateSession(session.id, { status: "cancelo_aviso" });
   }
 
   const occupied = useMemo(() => {
@@ -108,11 +173,18 @@ export default function AgendaPage() {
             Próximo →
           </button>
         </div>
-        {workingProfessionals.length > 0 && (
-          <button className="btn" onClick={() => setBlockModal(true)}>
-            + Bloquear horário
-          </button>
-        )}
+        <div className="row-actions">
+          {scheduledProfessionals.filter((p) => !absentIds.has(p.id)).length > 0 && (
+            <button className="btn secondary" onClick={() => setAbsenceModal(true)}>
+              + Profissional ausente
+            </button>
+          )}
+          {columns.length > 0 && (
+            <button className="btn" onClick={() => setBlockModal(true)}>
+              + Bloquear horário
+            </button>
+          )}
+        </div>
       </div>
 
       <h1 className="agenda-date-title">{formatLongDate(date)}</h1>
@@ -121,9 +193,21 @@ export default function AgendaPage() {
         <div className="error-banner">{sessionsError ?? blocksError}</div>
       )}
 
+      {exceptions.map((ex) => (
+        <AbsentProfessionalBanner
+          key={ex.id}
+          exception={ex}
+          sessions={sessions.filter((s) => s.professionalId === ex.professionalId)}
+          replacementOptions={professionals.filter((p) => p.active && p.id !== ex.professionalId)}
+          onReassign={handleReassign}
+          onCancelSession={handleCancelSession}
+          onRemoveException={() => removeException(ex.id)}
+        />
+      ))}
+
       {loading ? (
         <p>Carregando...</p>
-      ) : workingProfessionals.length === 0 ? (
+      ) : columns.length === 0 ? (
         <div className="empty-state">
           Nenhum profissional escalado para este dia. Configure a escala semanal em Profissionais.
         </div>
@@ -132,14 +216,14 @@ export default function AgendaPage() {
           <div
             className="agenda-grid"
             style={{
-              gridTemplateColumns: `72px repeat(${workingProfessionals.length}, minmax(170px, 1fr))`,
+              gridTemplateColumns: `72px repeat(${columns.length}, minmax(170px, 1fr))`,
               gridTemplateRows: `44px repeat(${slots.length}, 30px)`,
             }}
           >
             <div className="agenda-corner" style={{ gridRow: 1, gridColumn: 1 }} />
-            {workingProfessionals.map((p, i) => (
-              <div className="agenda-col-header" key={p.id} style={{ gridRow: 1, gridColumn: i + 2 }}>
-                {p.name}
+            {columns.map((col, i) => (
+              <div className="agenda-col-header" key={col.professional.id} style={{ gridRow: 1, gridColumn: i + 2 }}>
+                {col.professional.name}
               </div>
             ))}
 
@@ -149,8 +233,9 @@ export default function AgendaPage() {
               </div>
             ))}
 
-            {workingProfessionals.map((prof, colIdx) => {
-              const daySchedule = prof.defaultSchedule[weekday]!;
+            {columns.map((col, colIdx) => {
+              const prof = col.professional;
+              const daySchedule = col.schedule;
               const profSessions = sessions.filter((s) => s.professionalId === prof.id);
               const profBlocks = blocks.filter((b) => b.professionalId === prof.id);
               const continuationSlots = new Set<string>();
@@ -208,7 +293,10 @@ export default function AgendaPage() {
                       onClick={() => openEdit(prof, session)}
                     >
                       <strong>{session.patientName}</strong>
-                      <span>{STATUS_LABELS[session.status]}</span>
+                      <span>
+                        {STATUS_LABELS[session.status]}
+                        {session.scheduledProfessionalName && ` · reemplazo de ${session.scheduledProfessionalName}`}
+                      </span>
                     </button>
                   );
                 }
@@ -259,11 +347,23 @@ export default function AgendaPage() {
       {blockModal && (
         <BlockModal
           date={date}
-          professionals={workingProfessionals}
+          professionals={columns.map((c) => c.professional)}
           onSave={async (input) => {
             await addBlock(input);
           }}
           onClose={() => setBlockModal(false)}
+        />
+      )}
+
+      {absenceModal && (
+        <AbsenceModal
+          date={date}
+          scheduledProfessionals={scheduledProfessionals.filter((p) => !absentIds.has(p.id))}
+          allProfessionals={professionals}
+          onSave={async (input) => {
+            await addException(input);
+          }}
+          onClose={() => setAbsenceModal(false)}
         />
       )}
     </div>
