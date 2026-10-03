@@ -77,5 +77,9 @@ service cloud.firestore {
     match /waitlist/{id} {
       allow read, write: if isAuthorized();
     }
+
+    match /dailySettlements/{id} {
+      allow read, write: if isAuthorized();
+    }
   }
 }

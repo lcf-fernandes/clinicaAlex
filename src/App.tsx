@@ -5,11 +5,20 @@ import PatientsPage from "./modules/patients/PatientsPage";
 import PaymentsPage from "./modules/payments/PaymentsPage";
 import RecurringRulesPage from "./modules/recurring/RecurringRulesPage";
 import WaitlistPage from "./modules/waitlist/WaitlistPage";
+import SettlementPage from "./modules/settlement/SettlementPage";
 import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
 import { useAuth } from "./shared/auth/useAuth";
 
-type Section = "agenda" | "professionals" | "patients" | "recurring" | "waitlist" | "payments" | "users";
+type Section =
+  | "agenda"
+  | "professionals"
+  | "patients"
+  | "recurring"
+  | "waitlist"
+  | "payments"
+  | "settlement"
+  | "users";
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "agenda", label: "Agenda" },
@@ -18,6 +27,7 @@ const SECTIONS: { key: Section; label: string }[] = [
   { key: "recurring", label: "Pacientes fixos" },
   { key: "waitlist", label: "Lista de espera" },
   { key: "payments", label: "Pagamentos" },
+  { key: "settlement", label: "Liquidação" },
 ];
 
 export default function App() {
@@ -67,6 +77,7 @@ export default function App() {
         {section === "recurring" && <RecurringRulesPage />}
         {section === "waitlist" && <WaitlistPage />}
         {section === "payments" && <PaymentsPage />}
+        {section === "settlement" && <SettlementPage />}
         {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
       </div>
     </div>

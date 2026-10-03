@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   type QueryConstraint,
 } from "firebase/firestore";
@@ -59,4 +60,21 @@ export async function updateDocById(
 
 export async function deleteDocById(collectionName: string, id: string) {
   await deleteDoc(doc(db, collectionName, id));
+}
+
+/**
+ * Cria ou substitui por completo um documento com ID próprio (não
+ * gerado pelo Firestore) — útil quando o ID é previsível (ex.:
+ * `${professionalId}_${date}`), em vez de addDoc + guardar a
+ * referência. Sobrescreve o documento inteiro, não faz merge parcial.
+ */
+export async function setDocById(
+  collectionName: string,
+  id: string,
+  data: Record<string, unknown>
+) {
+  await setDoc(doc(db, collectionName, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
 }

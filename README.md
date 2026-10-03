@@ -10,6 +10,13 @@ pacientes, pagamentos, pacientes fixos, reemplazos e liquidação diária.
 
 ## Status
 
+🎉 **As 7 fases do roadmap original (seção 8 do documento de
+arquitetura) estão concluídas.** Pendências conhecidas: as duas Cloud
+Functions documentadas abaixo (exclusão de usuário via Admin SDK,
+geração de paciente fixo por job agendado) e qualquer item da seção
+"Pontos em aberto" da arquitetura ainda não decidido. Detalhe por
+fase:
+
 **Fase 1** concluída: modelo de dados no Firestore, CRUD de
 Profissionais e Pacientes (com perfis de facturación), login por
 **usuário**/senha (Firebase Auth + lookup usuário→e-mail no Firestore)
@@ -81,6 +88,31 @@ acima da busca de paciente; escolher um já preenche tudo e, ao salvar,
 marca aquela entrada como "convertida" automaticamente. Lista de
 espera não reserva horário nenhum — é só um registro de interesse, como
 a especificação pede.
+
+**Fase 7** concluída: **Liquidação diária** (itens 17-20 da
+especificação) — última fase do roadmap original. Pra cada
+profissional com sessão `asistio` naquele dia:
+
+```
+sessões (unidades de 1h, 120min = 2 — item 18)
+× valor por sessão                    = bruto
+− custo de sala
+− (sessões × taxa por sessão)         = taxas
+− ajustes manuais (item 19)
+= a receber
+```
+
+Liquida quem **realmente atendeu** (`session.professionalId`), não o
+profissional habitual original de um reemplazo
+(`scheduledProfessionalId`) — é exatamente o dado que a Fase 5 passou a
+preservar pensando nisso. Antes de fechar, os valores são recalculados
+ao vivo (se uma presença for corrigida, o número muda na hora); ao
+clicar **Fechar** (por profissional ou o dia inteiro de uma vez), o
+snapshot final é gravado e passa a ficar travado — mesmo que a agenda
+daquele dia seja editada depois, o valor fechado não muda sozinho. Dá
+pra **Reabrir** se precisar corrigir. Ajustes manuais (concepto + valor,
+ex. "Almuerzo") ficam guardados por profissional/dia e entram no
+cálculo antes do fechamento.
 
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
@@ -174,5 +206,6 @@ src/
     recurring/         # pacientes fixos: regra + exceções por data
     waitlist/           # lista de espera, sugestões na Agenda
     payments/          # pagamentos pendentes (todas as datas)
+    settlement/          # liquidação diária por profissional, ajustes, fechamento
     users/            # painel de usuários (admin)
 ```
