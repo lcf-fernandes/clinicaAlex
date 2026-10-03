@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { useProfessionals } from "../professionals/useProfessionals";
+import { useRecurringRules } from "../recurring/useRecurringRules";
 import { useSessions } from "./useSessions";
 import { useBlocks } from "./useBlocks";
+import { useAutoGenerateRecurringSessions } from "./useAutoGenerateRecurringSessions";
 import SessionModal from "./SessionModal";
 import BlockModal from "./BlockModal";
 import { addDays, formatLongDate, todayISO, weekdayOf } from "../../shared/date";
@@ -20,11 +22,24 @@ export default function AgendaPage() {
   const { sessions, loading: loadingSessions, error: sessionsError, addSession, updateSession, removeSession } =
     useSessions(date);
   const { blocks, loading: loadingBlocks, error: blocksError, addBlock, removeBlock } = useBlocks(date);
+  const { rules, loading: loadingRules } = useRecurringRules();
 
   const [sessionModal, setSessionModal] = useState<SessionModalState | null>(null);
   const [blockModal, setBlockModal] = useState(false);
 
   const weekday = weekdayOf(date);
+
+  useAutoGenerateRecurringSessions({
+    date,
+    weekday,
+    rules,
+    rulesLoading: loadingRules,
+    sessions,
+    sessionsLoading: loadingSessions,
+    blocks,
+    blocksLoading: loadingBlocks,
+    addSession,
+  });
 
   const workingProfessionals = useMemo(
     () =>

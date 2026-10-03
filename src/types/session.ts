@@ -20,6 +20,8 @@ export interface Session {
   status: SessionStatus;
   payment?: SessionPayment;
   notes?: string;
+  /** Presente quando a sessão foi gerada a partir de um paciente fixo (ver src/types/recurringRule.ts). */
+  recurringRuleId?: string;
   createdAt: number;
   updatedAt: number;
 }

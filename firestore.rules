@@ -62,5 +62,11 @@ service cloud.firestore {
     match /blocks/{id} {
       allow read, write: if isAuthorized();
     }
+
+    // Pacientes fixos: regra permanente (dia/horário/profissional) +
+    // exceções pontuais por data, embutidas no próprio documento.
+    match /recurringRules/{id} {
+      allow read, write: if isAuthorized();
+    }
   }
 }

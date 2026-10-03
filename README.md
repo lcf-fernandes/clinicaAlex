@@ -37,6 +37,25 @@ isso já é verdade hoje porque liquidação (Fase 7) ainda não existe;
 quando for implementada, ela soma por `status == "asistio"`, não por
 `payment.method`.
 
+**Fase 4** concluída: **Pacientes fixos** — regra permanente (dia da
+semana + horário + profissional) com exceções pontuais por data
+embutidas no mesmo documento (`cancel` / `reassign` / `reschedule`),
+sem nunca sobrescrever a regra permanente (item 10/23 da
+especificação). "Encerrar" marca `active: false` e guarda a data —
+não apaga nada, o histórico de sessões já geradas continua intacto.
+
+> **Decisão de implementação:** a arquitetura original previa um job
+> agendado (Cloud Function) rodando todo dia de madrugada pra gerar as
+> sessões da semana seguinte. Como o projeto ainda não tem Cloud
+> Functions configuradas, a geração acontece de forma preguiçosa: na
+> primeira vez que a secretária abre a Agenda para um dia que tem
+> paciente(s) fixo(s) programado(s), o app cria a sessão correspondente
+> na hora (ver `useAutoGenerateRecurringSessions`), aplicando exceções e
+> pulando se o horário já estiver ocupado por outra coisa. É idempotente
+> — abrir a mesma data de novo não duplica. Migrar isso pra um job
+> real no back-end fica junto com a Cloud Function de exclusão de
+> usuário, já documentada acima.
+
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
 > em `usernames/{username}`), mas a credencial em si no **Firebase
@@ -126,6 +145,7 @@ src/
     agenda/           # grade diária, criação/edição de sessão, bloqueios
     professionals/    # listagem + formulário de profissionais
     patients/         # listagem + formulário + histórico de sessões do paciente
+    recurring/         # pacientes fixos: regra + exceções por data
     payments/          # pagamentos pendentes (todas as datas)
     users/            # painel de usuários (admin)
 ```
