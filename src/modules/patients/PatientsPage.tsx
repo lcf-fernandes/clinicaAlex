@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { usePatients } from "./usePatients";
 import PatientForm from "./PatientForm";
+import PatientHistoryPanel from "./PatientHistoryPanel";
 import type { Patient, PatientInput } from "../../types/patient";
 
 export default function PatientsPage() {
   const { patients, loading, error, addPatient, updatePatient, removePatient } = usePatients();
   const [editing, setEditing] = useState<Patient | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [historyOf, setHistoryOf] = useState<Patient | null>(null);
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -102,6 +104,7 @@ export default function PatientsPage() {
                       </td>
                       <td>
                         <div className="row-actions">
+                          <button onClick={() => setHistoryOf(p)}>Histórico</button>
                           <button onClick={() => startEdit(p)}>Editar</button>
                           <button onClick={() => handleRemove(p)}>Remover</button>
                         </div>
@@ -125,6 +128,14 @@ export default function PatientsPage() {
           />
         )}
       </div>
+
+      {historyOf && (
+        <PatientHistoryPanel
+          patientId={historyOf.id}
+          patientName={historyOf.fullName}
+          onClose={() => setHistoryOf(null)}
+        />
+      )}
     </div>
   );
 }

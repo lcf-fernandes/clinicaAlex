@@ -13,6 +13,7 @@ export interface Session {
   startTime: string; // "08:00"
   durationMinutes: number; // 60 (padrão) ou 120 (sessão dupla, item 18 da spec)
   professionalId: string;
+  professionalName: string; // guardado junto, útil pro histórico do paciente (que cruza vários profissionais)
   patientId: string;
   patientName: string; // guardado junto pra não precisar buscar o paciente toda hora na grade
   billingProfileId?: string;

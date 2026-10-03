@@ -2,16 +2,18 @@ import { useState } from "react";
 import AgendaPage from "./modules/agenda/AgendaPage";
 import ProfessionalsPage from "./modules/professionals/ProfessionalsPage";
 import PatientsPage from "./modules/patients/PatientsPage";
+import PaymentsPage from "./modules/payments/PaymentsPage";
 import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
 import { useAuth } from "./shared/auth/useAuth";
 
-type Section = "agenda" | "professionals" | "patients" | "users";
+type Section = "agenda" | "professionals" | "patients" | "payments" | "users";
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "agenda", label: "Agenda" },
   { key: "professionals", label: "Profissionais" },
   { key: "patients", label: "Pacientes" },
+  { key: "payments", label: "Pagamentos" },
 ];
 
 export default function App() {
@@ -58,6 +60,7 @@ export default function App() {
         {section === "agenda" && <AgendaPage />}
         {section === "professionals" && <ProfessionalsPage />}
         {section === "patients" && <PatientsPage />}
+        {section === "payments" && <PaymentsPage />}
         {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
       </div>
     </div>

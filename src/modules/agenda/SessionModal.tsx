@@ -83,6 +83,7 @@ export default function SessionModal({
       await onSave({
         date,
         professionalId,
+        professionalName,
         startTime,
         durationMinutes,
         patientId,

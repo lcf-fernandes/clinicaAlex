@@ -26,6 +26,17 @@ min, status, pagamento), clique numa sessão existente permite editar
 ou remover, bloqueio de horário por profissional, e validação de
 conflito (não deixa sobrepor sessão/bloqueio já existente).
 
+**Fase 3** concluída: **histórico do paciente** (botão "Histórico" em
+Pacientes — lista todas as sessões já realizadas, canceladas ou
+faltadas, de qualquer data, com status e pagamento) e tela de
+**Pagamentos pendentes** (lista, em qualquer data, toda sessão com
+`payment.method == "pendiente"`, com ação rápida pra marcar como
+paga). Sessão realizada conta pra liquidação do profissional
+independente do pagamento estar pendente (item 16 da especificação) —
+isso já é verdade hoje porque liquidação (Fase 7) ainda não existe;
+quando for implementada, ela soma por `status == "asistio"`, não por
+`payment.method`.
+
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
 > em `usernames/{username}`), mas a credencial em si no **Firebase
@@ -114,6 +125,7 @@ src/
     auth/            # tela de login
     agenda/           # grade diária, criação/edição de sessão, bloqueios
     professionals/    # listagem + formulário de profissionais
-    patients/         # listagem + formulário de pacientes
+    patients/         # listagem + formulário + histórico de sessões do paciente
+    payments/          # pagamentos pendentes (todas as datas)
     users/            # painel de usuários (admin)
 ```

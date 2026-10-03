@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { where } from "firebase/firestore";
-import {
-  createDoc,
-  deleteDocById,
-  subscribeCollection,
-  updateDocById,
-} from "../../shared/firestore/crud";
-import type { Session, SessionInput } from "../../types/session";
+import { subscribeCollection, updateDocById } from "../../shared/firestore/crud";
+import type { Session, SessionPayment } from "../../types/session";
 
 const COLLECTION = "sessions";
 
@@ -29,40 +24,45 @@ function mapSession(id: string, data: Record<string, unknown>): Session {
   };
 }
 
-export function useSessions(date: string) {
+/**
+ * Sem orderBy de propósito: ordenar por data exigiria um índice
+ * composto (patientId == X + orderBy date), já que são campos
+ * diferentes. Como o volume por paciente é pequeno, ordena no client.
+ */
+export function usePatientHistory(patientId: string | null) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!patientId) {
+      setSessions([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const unsubscribe = subscribeCollection<Session>(
       COLLECTION,
       mapSession,
       (items) => {
-        setSessions(items.sort((a, b) => a.startTime.localeCompare(b.startTime)));
+        const sorted = [...items].sort((a, b) =>
+          b.date === a.date ? b.startTime.localeCompare(a.startTime) : b.date.localeCompare(a.date)
+        );
+        setSessions(sorted);
         setLoading(false);
       },
       (err) => {
         setError(err.message);
         setLoading(false);
       },
-      [where("date", "==", date)]
+      [where("patientId", "==", patientId)]
     );
     return unsubscribe;
-  }, [date]);
+  }, [patientId]);
 
-  async function addSession(input: SessionInput) {
-    return createDoc(COLLECTION, input);
+  async function markPaid(sessionId: string, payment: SessionPayment) {
+    return updateDocById(COLLECTION, sessionId, { payment });
   }
 
-  async function updateSession(id: string, input: Partial<SessionInput>) {
-    return updateDocById(COLLECTION, id, input);
-  }
-
-  async function removeSession(id: string) {
-    return deleteDocById(COLLECTION, id);
-  }
-
-  return { sessions, loading, error, addSession, updateSession, removeSession };
+  return { sessions, loading, error, markPaid };
 }
