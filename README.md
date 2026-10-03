@@ -71,6 +71,17 @@ profissional habitual) além de `professionalId`/`Name` (quem atendeu
 de fato) — ambos os dados ficam preservados pra quando a liquidação
 (Fase 7) for implementada.
 
+**Fase 6** concluída: **Lista de espera** (itens 21-22 da
+especificação). Nova seção cadastra paciente + preferência de horário
+(manhã/tarde/qualquer), profissional preferido (opcional) e dias
+preferidos (opcional — vazio = qualquer dia). Ao abrir uma sessão nova
+na Agenda, se algum paciente da lista bate com aquele profissional/dia
+da semana/período do horário clicado, aparece como sugestão rápida
+acima da busca de paciente; escolher um já preenche tudo e, ao salvar,
+marca aquela entrada como "convertida" automaticamente. Lista de
+espera não reserva horário nenhum — é só um registro de interesse, como
+a especificação pede.
+
 > **Pendente, documentado mas não implementado:** "Apagar" no painel
 > Usuários remove o acesso ao app (perfil em `users/{uid}` e o vínculo
 > em `usernames/{username}`), mas a credencial em si no **Firebase
@@ -161,6 +172,7 @@ src/
     professionals/    # listagem + formulário de profissionais
     patients/         # listagem + formulário + histórico de sessões do paciente
     recurring/         # pacientes fixos: regra + exceções por data
+    waitlist/           # lista de espera, sugestões na Agenda
     payments/          # pagamentos pendentes (todas as datas)
     users/            # painel de usuários (admin)
 ```

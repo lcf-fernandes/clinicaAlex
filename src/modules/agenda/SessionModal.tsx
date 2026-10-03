@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { usePatients } from "../patients/usePatients";
+import type { WaitlistEntry } from "../../types/waitlistEntry";
 import {
   PAYMENT_LABELS,
   STATUS_LABELS,
@@ -23,8 +24,11 @@ interface Props {
   existing?: Session;
   /** Sessões/bloqueios já ocupados desse profissional nesse dia, pra validar sobreposição (exclui a própria sessão em edição). */
   occupied: ConflictCheckItem[];
+  /** Pacientes da lista de espera compatíveis com esse horário (só faz sentido numa sessão nova). */
+  waitlistMatches?: WaitlistEntry[];
   onSave: (input: SessionInput) => Promise<void>;
   onDelete?: () => Promise<void>;
+  onConvertWaitlistEntry?: (entryId: string) => Promise<void>;
   onClose: () => void;
 }
 
@@ -35,13 +39,16 @@ export default function SessionModal({
   defaultStartTime,
   existing,
   occupied,
+  waitlistMatches,
   onSave,
   onDelete,
+  onConvertWaitlistEntry,
   onClose,
 }: Props) {
   const { patients } = usePatients();
   const [patientSearch, setPatientSearch] = useState(existing?.patientName ?? "");
   const [patientId, setPatientId] = useState(existing?.patientId ?? "");
+  const [fromWaitlistId, setFromWaitlistId] = useState<string | null>(null);
   const [startTime, setStartTime] = useState(existing?.startTime ?? defaultStartTime);
   const [durationMinutes, setDurationMinutes] = useState(existing?.durationMinutes ?? 60);
   const [status, setStatus] = useState<SessionStatus>(existing?.status ?? "agendado");
@@ -65,6 +72,13 @@ export default function SessionModal({
   function pickPatient(id: string, name: string) {
     setPatientId(id);
     setPatientSearch(name);
+    setFromWaitlistId(null);
+  }
+
+  function pickFromWaitlist(entry: WaitlistEntry) {
+    setPatientId(entry.patientId);
+    setPatientSearch(entry.patientName);
+    setFromWaitlistId(entry.id);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -97,6 +111,9 @@ export default function SessionModal({
           : undefined,
         notes: notes.trim() || undefined,
       });
+      if (fromWaitlistId && onConvertWaitlistEntry) {
+        await onConvertWaitlistEntry(fromWaitlistId);
+      }
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao salvar.");
@@ -125,6 +142,24 @@ export default function SessionModal({
           {existing ? "Editar sessão" : "Nova sessão"} — {professionalName}
         </h2>
         {error && <div className="error-banner">{error}</div>}
+
+        {!existing && waitlistMatches && waitlistMatches.length > 0 && (
+          <div className="field">
+            <label>Da lista de espera</label>
+            <div className="waitlist-suggestions">
+              {waitlistMatches.map((entry) => (
+                <button
+                  type="button"
+                  key={entry.id}
+                  className="waitlist-suggestion-btn"
+                  onClick={() => pickFromWaitlist(entry)}
+                >
+                  {entry.patientName}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="field" style={{ position: "relative" }}>
           <label htmlFor="patient">Paciente</label>

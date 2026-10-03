@@ -4,7 +4,9 @@ import { useRecurringRules } from "../recurring/useRecurringRules";
 import { useSessions } from "./useSessions";
 import { useBlocks } from "./useBlocks";
 import { useScheduleExceptions } from "./useScheduleExceptions";
+import { useWaitlist } from "../waitlist/useWaitlist";
 import { useAutoGenerateRecurringSessions } from "./useAutoGenerateRecurringSessions";
+import { matchesSlot } from "../../types/waitlistEntry";
 import SessionModal from "./SessionModal";
 import BlockModal from "./BlockModal";
 import AbsenceModal from "./AbsenceModal";
@@ -37,6 +39,7 @@ export default function AgendaPage() {
     addException,
     removeException,
   } = useScheduleExceptions(date);
+  const { entries: waitlistEntries, setStatus: setWaitlistStatus } = useWaitlist();
 
   const [sessionModal, setSessionModal] = useState<SessionModalState | null>(null);
   const [blockModal, setBlockModal] = useState(false);
@@ -143,6 +146,13 @@ export default function AgendaPage() {
   async function handleCancelSession(session: Session) {
     await updateSession(session.id, { status: "cancelo_aviso" });
   }
+
+  const waitlistMatches = useMemo(() => {
+    if (!sessionModal || sessionModal.existing) return [];
+    return waitlistEntries.filter((e) =>
+      matchesSlot(e, sessionModal.professional.id, weekday, sessionModal.startTime)
+    );
+  }, [sessionModal, waitlistEntries, weekday]);
 
   const occupied = useMemo(() => {
     if (!sessionModal) return [];
@@ -326,6 +336,7 @@ export default function AgendaPage() {
           defaultStartTime={sessionModal.startTime}
           existing={sessionModal.existing}
           occupied={occupied}
+          waitlistMatches={waitlistMatches}
           onSave={async (input) => {
             if (sessionModal.existing) {
               await updateSession(sessionModal.existing.id, input);
@@ -340,6 +351,7 @@ export default function AgendaPage() {
                 }
               : undefined
           }
+          onConvertWaitlistEntry={(entryId) => setWaitlistStatus(entryId, "convertido")}
           onClose={() => setSessionModal(null)}
         />
       )}

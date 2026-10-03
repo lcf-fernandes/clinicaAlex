@@ -73,5 +73,9 @@ service cloud.firestore {
     match /scheduleExceptions/{id} {
       allow read, write: if isAuthorized();
     }
+
+    match /waitlist/{id} {
+      allow read, write: if isAuthorized();
+    }
   }
 }

@@ -571,3 +571,38 @@ button.agenda-cell {
   font-size: 12px;
   padding: 3px 7px;
 }
+
+/* Lista de espera */
+.weekday-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.weekday-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  margin-bottom: 0;
+}
+
+.weekday-checkbox input {
+  width: auto;
+}
+
+.waitlist-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.waitlist-suggestion-btn {
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: var(--bg);
+  color: var(--primary);
+}

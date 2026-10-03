@@ -4,17 +4,19 @@ import ProfessionalsPage from "./modules/professionals/ProfessionalsPage";
 import PatientsPage from "./modules/patients/PatientsPage";
 import PaymentsPage from "./modules/payments/PaymentsPage";
 import RecurringRulesPage from "./modules/recurring/RecurringRulesPage";
+import WaitlistPage from "./modules/waitlist/WaitlistPage";
 import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
 import { useAuth } from "./shared/auth/useAuth";
 
-type Section = "agenda" | "professionals" | "patients" | "recurring" | "payments" | "users";
+type Section = "agenda" | "professionals" | "patients" | "recurring" | "waitlist" | "payments" | "users";
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "agenda", label: "Agenda" },
   { key: "professionals", label: "Profissionais" },
   { key: "patients", label: "Pacientes" },
   { key: "recurring", label: "Pacientes fixos" },
+  { key: "waitlist", label: "Lista de espera" },
   { key: "payments", label: "Pagamentos" },
 ];
 
@@ -63,6 +65,7 @@ export default function App() {
         {section === "professionals" && <ProfessionalsPage />}
         {section === "patients" && <PatientsPage />}
         {section === "recurring" && <RecurringRulesPage />}
+        {section === "waitlist" && <WaitlistPage />}
         {section === "payments" && <PaymentsPage />}
         {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
       </div>
