@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // Configuração do projeto "clinicaalex-47cf9" no Firebase Console,
@@ -19,5 +19,9 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+// ignoreUndefinedProperties: os formulários costumam montar objetos
+// com "campo: valor || undefined" pra campos opcionais vazios — sem
+// isso, o Firestore rejeita addDoc()/setDoc() com "Unsupported field
+// value: undefined" em qualquer um desses campos.
+export const db = initializeFirestore(app, { ignoreUndefinedProperties: true });
 export const auth = getAuth(app);
