@@ -18,9 +18,12 @@ const EMPTY_SCHEDULE: WeeklySchedule = {};
 export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
   const [active, setActive] = useState(initial?.active ?? true);
-  const [sessionRate, setSessionRate] = useState(initial?.sessionRate ?? 0);
-  const [roomCost, setRoomCost] = useState(initial?.roomCost ?? 0);
-  const [perSessionFee, setPerSessionFee] = useState(initial?.perSessionFee ?? 0);
+  // String livre, não number: um <input type="number"> controlado por
+  // state numérico não deixa apagar o dígito até ficar vazio (volta
+  // pra "0" na hora), o que atrapalha digitar um valor novo do zero.
+  const [sessionRate, setSessionRate] = useState(initial?.sessionRate?.toString() ?? "");
+  const [roomCost, setRoomCost] = useState(initial?.roomCost?.toString() ?? "");
+  const [perSessionFee, setPerSessionFee] = useState(initial?.perSessionFee?.toString() ?? "");
   const [schedule, setSchedule] = useState<WeeklySchedule>(
     initial?.defaultSchedule ?? EMPTY_SCHEDULE
   );
@@ -58,9 +61,9 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
       await onSave({
         name: name.trim(),
         active,
-        sessionRate: Number(sessionRate) || 0,
-        roomCost: Number(roomCost) || 0,
-        perSessionFee: Number(perSessionFee) || 0,
+        sessionRate: Number(sessionRate.replace(",", ".")) || 0,
+        roomCost: Number(roomCost.replace(",", ".")) || 0,
+        perSessionFee: Number(perSessionFee.replace(",", ".")) || 0,
         defaultSchedule: schedule,
       });
     } catch (err) {
@@ -105,7 +108,8 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
             type="number"
             min={0}
             value={sessionRate}
-            onChange={(e) => setSessionRate(Number(e.target.value))}
+            onChange={(e) => setSessionRate(e.target.value)}
+            placeholder="0"
           />
         </div>
         <div className="field">
@@ -115,7 +119,8 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
             type="number"
             min={0}
             value={roomCost}
-            onChange={(e) => setRoomCost(Number(e.target.value))}
+            onChange={(e) => setRoomCost(e.target.value)}
+            placeholder="0"
           />
         </div>
         <div className="field">
@@ -125,7 +130,8 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
             type="number"
             min={0}
             value={perSessionFee}
-            onChange={(e) => setPerSessionFee(Number(e.target.value))}
+            onChange={(e) => setPerSessionFee(e.target.value)}
+            placeholder="0"
           />
         </div>
       </div>

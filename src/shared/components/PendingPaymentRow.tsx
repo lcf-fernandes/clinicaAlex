@@ -9,13 +9,16 @@ interface Props {
 
 export default function PendingPaymentRow({ sessionId, defaultAmount, onConfirm }: Props) {
   const [method, setMethod] = useState<PaymentMethod>("efectivo");
-  const [amount, setAmount] = useState(defaultAmount);
+  // String livre, não number: um <input type="number"> controlado por
+  // state numérico não deixa apagar o dígito até ficar vazio (volta
+  // pra "0" na hora), o que atrapalha digitar um valor novo do zero.
+  const [amount, setAmount] = useState(defaultAmount.toString());
   const [saving, setSaving] = useState(false);
 
   async function confirm() {
     setSaving(true);
     try {
-      await onConfirm(sessionId, method, amount);
+      await onConfirm(sessionId, method, Number(amount.replace(",", ".")) || 0);
     } finally {
       setSaving(false);
     }
@@ -32,7 +35,7 @@ export default function PendingPaymentRow({ sessionId, defaultAmount, onConfirm 
         type="number"
         min={0}
         value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
+        onChange={(e) => setAmount(e.target.value)}
         style={{ width: 90 }}
       />
       <button type="button" onClick={confirm} disabled={saving}>

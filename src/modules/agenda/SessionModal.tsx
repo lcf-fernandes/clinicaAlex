@@ -48,7 +48,10 @@ export default function SessionModal({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">(
     existing?.payment?.method ?? ""
   );
-  const [paymentAmount, setPaymentAmount] = useState(existing?.payment?.amount ?? 0);
+  // String livre, não number: um <input type="number"> controlado por
+  // state numérico não deixa apagar o dígito até ficar vazio (volta pra
+  // "0" na hora), o que atrapalha digitar um valor novo do zero.
+  const [paymentAmount, setPaymentAmount] = useState(existing?.payment?.amount?.toString() ?? "");
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +92,9 @@ export default function SessionModal({
         patientId,
         patientName: patientSearch.trim(),
         status,
-        payment: paymentMethod ? { method: paymentMethod, amount: Number(paymentAmount) || 0 } : undefined,
+        payment: paymentMethod
+          ? { method: paymentMethod, amount: Number(paymentAmount.replace(",", ".")) || 0 }
+          : undefined,
         notes: notes.trim() || undefined,
       });
       onClose();
@@ -206,8 +211,9 @@ export default function SessionModal({
               type="number"
               min={0}
               value={paymentAmount}
-              onChange={(e) => setPaymentAmount(Number(e.target.value))}
+              onChange={(e) => setPaymentAmount(e.target.value)}
               disabled={!paymentMethod}
+              placeholder="0"
             />
           </div>
         </div>
