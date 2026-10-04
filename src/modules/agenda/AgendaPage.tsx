@@ -171,7 +171,7 @@ export default function AgendaPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="page-header no-print">
         <div className="agenda-date-nav">
           <button className="btn secondary" onClick={() => setDate((d) => addDays(d, -1))}>
             ← Anterior
@@ -190,8 +190,13 @@ export default function AgendaPage() {
             </button>
           )}
           {columns.length > 0 && (
-            <button className="btn" onClick={() => setBlockModal(true)}>
+            <button className="btn secondary" onClick={() => setBlockModal(true)}>
               + Bloquear horário
+            </button>
+          )}
+          {columns.length > 0 && (
+            <button className="btn" onClick={() => window.print()}>
+              🖶 Imprimir
             </button>
           )}
         </div>

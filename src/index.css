@@ -606,3 +606,78 @@ button.agenda-cell {
   background: var(--bg);
   color: var(--primary);
 }
+
+/* Impressão da Agenda */
+@media print {
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  .no-print,
+  .modal-overlay,
+  .absence-banner button,
+  .absence-banner select,
+  .absence-banner-header .link-button {
+    display: none !important;
+  }
+
+  body,
+  .app-shell,
+  .main {
+    background: #fff !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .agenda-date-title {
+    color: #000;
+  }
+
+  .agenda-scroll {
+    overflow: visible !important;
+    border: none;
+  }
+
+  .agenda-grid {
+    min-width: 0 !important;
+  }
+
+  .agenda-col-header,
+  .agenda-time-label,
+  .agenda-corner {
+    position: static !important;
+    background: #fff !important;
+  }
+
+  .agenda-cell,
+  .agenda-col-header,
+  .agenda-time-label,
+  .agenda-corner {
+    border-color: #999 !important;
+  }
+
+  .agenda-cell-outside {
+    background: #eee !important;
+  }
+
+  .agenda-cell-blocked {
+    background: #ddd !important;
+  }
+
+  .agenda-session {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+
+  .agenda-cell-available {
+    color: #999;
+  }
+
+  .absence-banner {
+    background: #fff !important;
+    border: 1px solid #000;
+  }
+}

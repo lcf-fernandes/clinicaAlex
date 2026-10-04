@@ -159,6 +159,14 @@ vem de dois lugares:
 > (`git filter-repo` ou recriar o repositório), me avise se quiser
 > ajuda com isso.
 
+## Impressão
+
+Botão "🖶 Imprimir" na Agenda chama `window.print()`; não gera PDF
+nenhum — usa a função nativa de imprimir/"Salvar como PDF" do
+navegador. Um `@media print` em `index.css` esconde a sidebar, os
+botões de navegação e os controles interativos do banner de ausência,
+e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
+
 ## Usuários
 
 Autenticação é por **usuário** (não e-mail) — o app resolve usuário →

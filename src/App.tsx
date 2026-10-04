@@ -47,7 +47,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <aside className="sidebar no-print">
         <h1>Clínica Alex</h1>
         <nav>
           {sections.map((s) => (
