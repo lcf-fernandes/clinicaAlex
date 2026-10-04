@@ -5,6 +5,7 @@ import type { UserProfile } from "../../types/user";
 
 interface Props {
   currentUid: string;
+  isAdmin: boolean;
 }
 
 const ROLE_LABELS: Record<UserProfile["role"], string> = {
@@ -13,9 +14,39 @@ const ROLE_LABELS: Record<UserProfile["role"], string> = {
   professional: "Profissional",
 };
 
-export default function UsersPage({ currentUid }: Props) {
+export default function UsersPage({ currentUid, isAdmin }: Props) {
+  const [showForm, setShowForm] = useState(!isAdmin);
+
+  if (!isAdmin) {
+    // Secretaria só cria conta de profissional — não vê a lista de
+    // outras contas nem bloqueia/apaga ninguém (isso fica só com admin).
+    return (
+      <div>
+        <div className="page-header">
+          <h1>Novo profissional</h1>
+        </div>
+        <CreateUserForm
+          allowedRoles={["professional"]}
+          onCreated={() => setShowForm(true)}
+          onCancel={() => setShowForm(true)}
+        />
+      </div>
+    );
+  }
+
+  return <AdminUsersView currentUid={currentUid} showForm={showForm} setShowForm={setShowForm} />;
+}
+
+function AdminUsersView({
+  currentUid,
+  showForm,
+  setShowForm,
+}: {
+  currentUid: string;
+  showForm: boolean;
+  setShowForm: (v: boolean) => void;
+}) {
   const { users, loading, error, setActive, removeUser } = useUsers();
-  const [showForm, setShowForm] = useState(false);
 
   async function toggleActive(user: UserProfile) {
     await setActive(user.uid, !user.active);
@@ -94,7 +125,11 @@ export default function UsersPage({ currentUid }: Props) {
         </div>
 
         {showForm && (
-          <CreateUserForm onCreated={() => setShowForm(false)} onCancel={() => setShowForm(false)} />
+          <CreateUserForm
+            allowedRoles={["admin", "secretary", "professional"]}
+            onCreated={() => setShowForm(false)}
+            onCancel={() => setShowForm(false)}
+          />
         )}
       </div>
     </div>

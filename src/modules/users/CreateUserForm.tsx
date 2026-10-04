@@ -7,6 +7,7 @@ import { useProfessionals } from "../professionals/useProfessionals";
 import { DEFAULT_PERMISSIONS, type UserRole } from "../../types/user";
 
 interface Props {
+  allowedRoles: UserRole[];
   onCreated: () => void;
   onCancel: () => void;
 }
@@ -17,12 +18,12 @@ const ROLE_LABELS: Record<UserRole, string> = {
   professional: "Profissional (só visualiza a própria agenda/liquidação)",
 };
 
-export default function CreateUserForm({ onCreated, onCancel }: Props) {
+export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Props) {
   const { professionals } = useProfessionals();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("secretary");
+  const [role, setRole] = useState<UserRole>(allowedRoles[0]);
   const [professionalId, setProfessionalId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,16 +113,18 @@ export default function CreateUserForm({ onCreated, onCancel }: Props) {
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="newRole">Papel</label>
-        <select id="newRole" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
-          {Object.entries(ROLE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {allowedRoles.length > 1 && (
+        <div className="field">
+          <label htmlFor="newRole">Papel</label>
+          <select id="newRole" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
+            {allowedRoles.map((value) => (
+              <option key={value} value={value}>
+                {ROLE_LABELS[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {role === "professional" && (
         <div className="field">

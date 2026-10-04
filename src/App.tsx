@@ -48,7 +48,7 @@ export default function App() {
   }
 
   const isAdmin = profile?.role === "admin";
-  const sections = isAdmin ? [...SECTIONS, { key: "users" as const, label: "Usuários" }] : SECTIONS;
+  const sections = [...SECTIONS, { key: "users" as const, label: "Usuários" }];
 
   return (
     <div className="app-shell">
@@ -83,7 +83,7 @@ export default function App() {
         {section === "waitlist" && <WaitlistPage />}
         {section === "payments" && <PaymentsPage />}
         {section === "settlement" && <SettlementPage />}
-        {section === "users" && isAdmin && <UsersPage currentUid={user.uid} />}
+        {section === "users" && <UsersPage currentUid={user.uid} isAdmin={isAdmin} />}
       </div>
     </div>
   );

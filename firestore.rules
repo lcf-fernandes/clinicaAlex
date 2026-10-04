@@ -36,20 +36,30 @@ service cloud.firestore {
     }
 
     // Cada usuário lê o próprio perfil (username, role, permissions);
-    // um admin lê todos. Só admin pode criar/editar/apagar usuários —
-    // é o painel "Usuários" do app (bloquear/desbloquear/apagar).
+    // um admin lê todos (precisa pra listar o painel Usuários — a
+    // secretaria não lê a lista, só cria). Admin cria/edita/apaga
+    // qualquer usuário; secretaria só CRIA usuário com role
+    // "professional" (não edita nem apaga ninguém, nem cria
+    // admin/secretary — isso é via Console por enquanto se precisar).
     match /users/{userId} {
       allow read: if isSignedIn() && (request.auth.uid == userId || role() == 'admin');
-      allow write: if isSignedIn() && role() == 'admin';
+      allow create: if isSignedIn() && (
+        role() == 'admin' ||
+        (role() == 'secretary' && request.resource.data.role == 'professional')
+      );
+      allow update, delete: if isSignedIn() && role() == 'admin';
     }
 
     // Lookup público usuário -> e-mail, usado só pra resolver o e-mail
     // ANTES do login (ainda sem sessão). Guarda só {email, uid} — nada
     // de role/active/permissions aqui, isso fica em users/{uid}.
-    // Escrita só por admin (acompanha a criação/remoção de usuários).
+    // Criação acompanha a de users/{uid} acima (admin ou secretaria
+    // criando profissional); editar/apagar um vínculo já existente
+    // continua só por admin.
     match /usernames/{username} {
       allow read: if true;
-      allow write: if isSignedIn() && role() == 'admin';
+      allow create: if isSignedIn() && role() in ['admin', 'secretary'];
+      allow update, delete: if isSignedIn() && role() == 'admin';
     }
 
     // Só secretaria/admin mexem nisso — um profissional logado não
