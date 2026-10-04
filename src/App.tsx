@@ -7,6 +7,7 @@ import RecurringRulesPage from "./modules/recurring/RecurringRulesPage";
 import WaitlistPage from "./modules/waitlist/WaitlistPage";
 import SettlementPage from "./modules/settlement/SettlementPage";
 import UsersPage from "./modules/users/UsersPage";
+import SettingsPage from "./modules/settings/SettingsPage";
 import LoginPage from "./modules/auth/LoginPage";
 import ProfessionalApp from "./ProfessionalApp";
 import { useAuth } from "./shared/auth/useAuth";
@@ -19,7 +20,8 @@ type Section =
   | "waitlist"
   | "payments"
   | "settlement"
-  | "users";
+  | "users"
+  | "settings";
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "agenda", label: "Agenda" },
@@ -48,7 +50,11 @@ export default function App() {
   }
 
   const isAdmin = profile?.role === "admin";
-  const sections = [...SECTIONS, { key: "users" as const, label: "Usuários" }];
+  const sections = [
+    ...SECTIONS,
+    { key: "users" as const, label: "Usuários" },
+    ...(isAdmin ? [{ key: "settings" as const, label: "Configurações" }] : []),
+  ];
 
   return (
     <div className="app-shell">
@@ -84,6 +90,7 @@ export default function App() {
         {section === "payments" && <PaymentsPage />}
         {section === "settlement" && <SettlementPage />}
         {section === "users" && <UsersPage currentUid={user.uid} isAdmin={isAdmin} />}
+        {section === "settings" && isAdmin && <SettingsPage />}
       </div>
     </div>
   );

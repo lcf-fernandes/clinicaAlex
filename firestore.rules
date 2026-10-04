@@ -105,5 +105,13 @@ service cloud.firestore {
       allow read: if isStaff() || (isAuthorized() && resource.data.professionalId == myProfessionalId());
       allow write: if isStaff();
     }
+
+    // Documento único com a quantidade de salas por dia da semana.
+    // Secretaria só lê (pro aviso de ocupação em Profissionais); só
+    // admin edita, é uma decisão estrutural da clínica.
+    match /clinicSettings/{id} {
+      allow read: if isStaff();
+      allow write: if isSignedIn() && role() == 'admin';
+    }
   }
 }

@@ -159,6 +159,21 @@ vem de dois lugares:
 > (`git filter-repo` ou recriar o repositório), me avise se quiser
 > ajuda com isso.
 
+## Configurações (salas por dia da semana)
+
+Resolve o último ponto em aberto da arquitetura (seção 9): quantas
+salas/profissionais simultâneos a clínica aguenta em cada dia. Nova
+seção "Configurações" (só admin) tem um número por dia da semana —
+começa com os valores da especificação original (8 na maioria dos
+dias, 9 às quartas), mas é editável.
+
+É um limite de **referência**, não uma trava: o formulário de
+Profissionais mostra "X/Y salas" ao lado de cada dia marcado (contando
+quantos outros profissionais ativos já têm aquele dia na escala), e
+fica vermelho se passar do configurado — mas não impede salvar. A
+clínica pode legitimamente ter um motivo pra passar do número num dia
+específico, então a decisão fica com quem está cadastrando.
+
 ## Impressão
 
 Botão "🖶 Imprimir" na Agenda chama `window.print()`; não gera PDF
@@ -252,5 +267,7 @@ src/
     waitlist/           # lista de espera, sugestões na Agenda
     payments/          # pagamentos pendentes (todas as datas)
     settlement/          # liquidação diária por profissional, ajustes, fechamento
+    settings/             # configuração de salas/profissionais por dia da semana
+    myself/                # telas somente-leitura do login de profissional
     users/            # painel de usuários (admin)
 ```

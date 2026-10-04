@@ -6,6 +6,8 @@ import {
   type Weekday,
   type WeeklySchedule,
 } from "../../types/professional";
+import { useProfessionals } from "./useProfessionals";
+import { useClinicSettings } from "../settings/useClinicSettings";
 
 interface Props {
   initial?: Professional;
@@ -16,6 +18,8 @@ interface Props {
 const EMPTY_SCHEDULE: WeeklySchedule = {};
 
 export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
+  const { professionals } = useProfessionals();
+  const { settings } = useClinicSettings();
   const [name, setName] = useState(initial?.name ?? "");
   const [active, setActive] = useState(initial?.active ?? true);
   // String livre, não number: um <input type="number"> controlado por
@@ -40,6 +44,14 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
       }
       return next;
     });
+  }
+
+  function occupancy(day: Weekday) {
+    const current = professionals.filter(
+      (p) => p.active && p.id !== initial?.id && p.defaultSchedule[day]
+    ).length;
+    const max = settings.roomsPerWeekday[day];
+    return { current, max };
   }
 
   function updateDay(day: Weekday, field: "start" | "end" | "room", value: string) {
@@ -142,6 +154,8 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
           {WEEKDAYS.map(({ key, label }) => {
             const day = schedule[key];
             const enabled = Boolean(day);
+            const { current, max } = occupancy(key);
+            const wouldExceed = enabled && max > 0 && current + 1 > max;
             return (
               <div className="schedule-day" key={key}>
                 <label style={{ marginBottom: 0 }}>
@@ -172,7 +186,15 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
                   value={day?.room ?? ""}
                   onChange={(e) => updateDay(key, "room", e.target.value)}
                 />
-                <span />
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    color: wouldExceed ? "var(--danger)" : "var(--text-muted)",
+                    alignSelf: "center",
+                  }}
+                >
+                  {enabled && max > 0 ? `${current + 1}/${max} salas` : ""}
+                </span>
               </div>
             );
           })}
