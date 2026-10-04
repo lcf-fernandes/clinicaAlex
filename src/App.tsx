@@ -8,6 +8,7 @@ import WaitlistPage from "./modules/waitlist/WaitlistPage";
 import SettlementPage from "./modules/settlement/SettlementPage";
 import UsersPage from "./modules/users/UsersPage";
 import LoginPage from "./modules/auth/LoginPage";
+import ProfessionalApp from "./ProfessionalApp";
 import { useAuth } from "./shared/auth/useAuth";
 
 type Section =
@@ -40,6 +41,10 @@ export default function App() {
 
   if (!user) {
     return <LoginPage onSignIn={signIn} />;
+  }
+
+  if (profile?.role === "professional") {
+    return <ProfessionalApp profile={profile} onSignOut={signOut} />;
   }
 
   const isAdmin = profile?.role === "admin";

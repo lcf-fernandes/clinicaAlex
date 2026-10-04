@@ -37,13 +37,19 @@ export function useAuth() {
     // além de "secretary".
     const username = (data.username as string) ?? (data.name as string) ?? "";
     const rawRole = String(data.role ?? "secretary").toLowerCase();
-    const role: UserProfile["role"] = rawRole.startsWith("admin") ? "admin" : "secretary";
+    const role: UserProfile["role"] = rawRole.startsWith("admin")
+      ? "admin"
+      : rawRole.startsWith("prof")
+      ? "professional"
+      : "secretary";
     return {
       uid,
       username,
       role,
       permissions: (data.permissions as UserProfile["permissions"]) ?? DEFAULT_PERMISSIONS[role],
       active: (data.active as boolean) ?? true,
+      professionalId: data.professionalId as string | undefined,
+      professionalName: data.professionalName as string | undefined,
     };
   }
 

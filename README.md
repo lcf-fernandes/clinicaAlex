@@ -178,9 +178,13 @@ passos 2 e 3 tem que ser exatamente o UID gerado no passo 1.
 1. **Firebase Auth** (Console → Authentication → Users → Add user) —
    e-mail e senha reais da conta.
 2. **Firestore `users/{uid}`** — o perfil com `username`, `role`
-   (`admin` ou `secretary`), `active` (boolean) e opcionalmente
-   `permissions` (ver `src/types/user.ts`). Protegido por regras: só o
-   próprio usuário ou um admin lê; só admin escreve.
+   (`admin`, `secretary` ou `professional`), `active` (boolean) e
+   opcionalmente `permissions` (ver `src/types/user.ts`). Protegido por
+   regras: só o próprio usuário ou um admin lê; só admin escreve. Pra
+   `role: "professional"`, adicione também `professionalId` (o ID do
+   documento correspondente em `professionals/{id}`) e
+   `professionalName` — sem isso a conta loga mas cai numa tela de erro
+   avisando que falta vincular.
 3. **Firestore `usernames/{username}`** — documento com ID igual ao
    texto que a pessoa digita no campo "Usuário" (ex.: `Overlord`),
    contendo `{ email: "<mesmo e-mail do passo 1>", uid: "<uid>" }`.
@@ -190,6 +194,32 @@ passos 2 e 3 tem que ser exatamente o UID gerado no passo 1.
 
 Nenhuma senha fica no código ou no histórico do git — são criadas
 manualmente no Console.
+
+### Papel "professional"
+
+Pensado pro próprio profissional acompanhar a agenda e a liquidação
+dele sem precisar ligar pra secretaria. Ao logar, cai num shell bem
+mais simples (`ProfessionalApp.tsx`) com só duas telas — **Minha
+Agenda** e **Minha Liquidação** — e tudo **somente leitura**: não edita
+sessão, não vê outros profissionais, não vê pacientes, não vê nada de
+`professionals`/`patients`/`blocks`/`recurringRules`/`scheduleExceptions`/`waitlist`.
+Isso é garantido em duas camadas:
+
+- **UI**: `ProfessionalApp` só importa os dois componentes de leitura
+  (`MyAgendaPage`, `MySettlementPage`), que não têm nenhum botão de
+  editar/criar.
+- **Regras do Firestore**: mesmo que alguém tentasse forçar uma
+  chamada direta à API, `sessions` e `dailySettlements` só liberam
+  leitura pra um profissional quando o documento retornado tem
+  `professionalId` igual ao dele (`role() in ['admin','secretary'] ||
+  resource.data.professionalId == myProfessionalId()`) — e nenhuma
+  escrita. As outras coleções (`professionals`, `patients`, etc.) ficam
+  bloqueadas pra esse papel inteiramente.
+
+A liquidação só aparece pro profissional depois que a secretaria/admin
+salvar algo pra aquele dia (ajuste ou fechamento) — o profissional não
+tem acesso à coleção `professionals` pra calcular um preview ao vivo
+sozinho, então sem o documento ele vê "liquidação ainda não disponível".
 
 Para publicar as regras de segurança do Firestore (`firestore.rules`) e
 os índices, use o Firebase CLI (`firebase deploy --only firestore`)

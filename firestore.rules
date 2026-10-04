@@ -25,6 +25,16 @@ service cloud.firestore {
       return isSignedIn() && isActive();
     }
 
+    // Secretaria/admin: acesso de verdade ao dia a dia da clínica.
+    function isStaff() {
+      return isAuthorized() && role() in ['admin', 'secretary'];
+    }
+
+    // Login de profissional: só visualização do que é dele mesmo.
+    function myProfessionalId() {
+      return myData().professionalId;
+    }
+
     // Cada usuário lê o próprio perfil (username, role, permissions);
     // um admin lê todos. Só admin pode criar/editar/apagar usuários —
     // é o painel "Usuários" do app (bloquear/desbloquear/apagar).
@@ -42,44 +52,48 @@ service cloud.firestore {
       allow write: if isSignedIn() && role() == 'admin';
     }
 
-    // Qualquer usuário autenticado E ativo (secretária ou admin) pode
-    // ler/escrever. Uma secretária lida com profissionais e pacientes,
-    // mas não com contas de outras secretarias (isso fica só em
-    // /users, restrito a admin acima).
+    // Só secretaria/admin mexem nisso — um profissional logado não
+    // precisa (nem deve) ver a lista de outros profissionais, pacientes,
+    // bloqueios, pacientes fixos, reemplazos ou lista de espera.
     match /professionals/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
     match /patients/{id} {
-      allow read, write: if isAuthorized();
-    }
-
-    // Agenda: sessões agendadas e bloqueios de horário de cada dia.
-    match /sessions/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
     match /blocks/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
-    // Pacientes fixos: regra permanente (dia/horário/profissional) +
-    // exceções pontuais por data, embutidas no próprio documento.
     match /recurringRules/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
-    // Ausência/reemplazo pontual de um profissional num dia.
     match /scheduleExceptions/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
     match /waitlist/{id} {
-      allow read, write: if isAuthorized();
+      allow read, write: if isStaff();
     }
 
+    // Sessões: secretaria/admin têm acesso total. Um profissional só
+    // lê (nunca escreve) as próprias sessões — e só funciona se a
+    // consulta do app já vier filtrada por professionalId (ver
+    // useMySessions), já que o Firestore nega a query inteira se
+    // algum documento do resultado não bater com a regra.
+    match /sessions/{id} {
+      allow read: if isStaff() || (isAuthorized() && resource.data.professionalId == myProfessionalId());
+      allow write: if isStaff();
+    }
+
+    // Liquidação diária: mesma lógica — profissional só lê a própria,
+    // nunca edita.
     match /dailySettlements/{id} {
-      allow read, write: if isAuthorized();
+      allow read: if isStaff() || (isAuthorized() && resource.data.professionalId == myProfessionalId());
+      allow write: if isStaff();
     }
   }
 }
