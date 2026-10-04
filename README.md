@@ -171,29 +171,36 @@ e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
 
 Autenticação é por **usuário** (não e-mail) — o app resolve usuário →
 e-mail consultando o Firestore em tempo real (`src/shared/auth/usernameMap.ts`),
-não um mapa fixo no código. Criar um usuário novo não exige deploy:
-basta criar os três registros abaixo pelo Console. O `uid` usado nos
-passos 2 e 3 tem que ser exatamente o UID gerado no passo 1.
+não um mapa fixo no código.
 
-1. **Firebase Auth** (Console → Authentication → Users → Add user) —
-   e-mail e senha reais da conta.
-2. **Firestore `users/{uid}`** — o perfil com `username`, `role`
-   (`admin`, `secretary` ou `professional`), `active` (boolean) e
-   opcionalmente `permissions` (ver `src/types/user.ts`). Protegido por
-   regras: só o próprio usuário ou um admin lê; só admin escreve. Pra
-   `role: "professional"`, adicione também `professionalId` (o ID do
-   documento correspondente em `professionals/{id}`) e
-   `professionalName` — sem isso a conta loga mas cai numa tela de erro
-   avisando que falta vincular.
-3. **Firestore `usernames/{username}`** — documento com ID igual ao
-   texto que a pessoa digita no campo "Usuário" (ex.: `Overlord`),
-   contendo `{ email: "<mesmo e-mail do passo 1>", uid: "<uid>" }`.
-   Essa coleção é de **leitura pública** (precisa ser consultada antes
-   do login, quando ainda não há sessão) — por isso só guarda o
-   vínculo usuário→e-mail, nunca papel/permissões.
+**Criar usuário é feito dentro do app** — painel Usuários → "+ Novo
+usuário" (só admin vê esse painel). Por trás, isso cria os três
+registros que antes eram manuais:
 
-Nenhuma senha fica no código ou no histórico do git — são criadas
-manualmente no Console.
+1. **Firebase Auth** — via `createAuthAccount` (`src/shared/auth/createAuthAccount.ts`),
+   que abre uma segunda instância do Firebase App só pra criar a
+   credencial, sem derrubar a sessão de quem está logado (truque
+   padrão do client SDK — não precisa de Cloud Function nem do plano
+   Blaze).
+2. **Firestore `users/{uid}`** — `username`, `role` (`admin`,
+   `secretary` ou `professional`), `active: true`, `permissions`
+   (default por papel, ver `src/types/user.ts`) e, se for
+   `professional`, `professionalId`/`professionalName` (escolhido num
+   select com os profissionais já cadastrados).
+3. **Firestore `usernames/{username}`** — `{ email, uid }`, checado
+   antes pra não deixar duplicar um usuário já existente.
+
+Nenhuma senha fica salva em lugar nenhum do código ou do histórico do
+git — a senha inicial só passa pelo formulário na hora da criação.
+
+Criação pelo Console (manual) ainda funciona se precisar — basta
+replicar os três registros acima com o mesmo formato.
+
+> Hoje só **admin** vê o painel Usuários e cria contas — secretaria não
+> tem esse botão. Se quiser que secretaria também possa criar conta de
+> profissional (sem gerenciar outras contas de secretaria/admin), é
+> questão de abrir uma exceção na regra do Firestore pra isso; me avisa
+> se for o caso.
 
 ### Papel "professional"
 

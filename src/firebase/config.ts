@@ -9,7 +9,7 @@ import { getAuth } from "firebase/auth";
 // a segurança real vem das regras do Firestore (firestore.rules), do
 // Firebase Auth e da restrição do apiKey no Google Cloud Console (ver
 // README), não de esconder este objeto.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBi2hqgw6IqvkNgsvkmjqILx5V0nI-Wogg",
   authDomain: "clinicaalex-47cf9.firebaseapp.com",
   projectId: "clinicaalex-47cf9",
