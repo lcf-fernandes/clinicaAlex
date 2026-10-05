@@ -37,7 +37,7 @@ export default function RecurringRulesPage() {
   }
 
   async function handleEnd(rule: RecurringRule) {
-    if (confirm(`Encerrar o turno fixo de ${rule.patientName}? O histórico de sessões não é afetado.`)) {
+    if (confirm(`¿Finalizar el turno fijo de ${rule.patientName}? El historial de sesiones no se ve afectado.`)) {
       await endRule(rule.id, todayISO());
     }
   }
@@ -47,7 +47,7 @@ export default function RecurringRulesPage() {
   }
 
   async function handleRemove(rule: RecurringRule) {
-    if (confirm(`Apagar completamente a regra de ${rule.patientName}? Isso não pode ser desfeito.`)) {
+    if (confirm(`¿Eliminar por completo la regla de ${rule.patientName}? Esto no se puede deshacer.`)) {
       await removeRule(rule.id);
     }
   }
@@ -59,10 +59,10 @@ export default function RecurringRulesPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>Pacientes fixos</h1>
+        <h1>Pacientes fijos</h1>
         {!showForm && (
           <button className="btn" onClick={startNew}>
-            + Novo paciente fixo
+            + Nuevo paciente fijo
           </button>
         )}
       </div>
@@ -72,17 +72,17 @@ export default function RecurringRulesPage() {
       <div className={showForm ? "layout-split" : ""}>
         <div>
           {loading ? (
-            <p>Carregando...</p>
+            <p>Cargando...</p>
           ) : rules.length === 0 ? (
-            <div className="empty-state">Nenhum paciente fixo cadastrado ainda.</div>
+            <div className="empty-state">Todavía no hay pacientes fijos registrados.</div>
           ) : (
             <table>
               <thead>
                 <tr>
                   <th>Paciente</th>
-                  <th>Dia / horário</th>
-                  <th>Profissional</th>
-                  <th>Status</th>
+                  <th>Día / horario</th>
+                  <th>Profesional</th>
+                  <th>Estado</th>
                   <th></th>
                 </tr>
               </thead>
@@ -96,7 +96,7 @@ export default function RecurringRulesPage() {
                       </td>
                       <td>{rule.professionalName}</td>
                       <td>
-                        {rule.active ? "Ativo" : `Encerrado em ${rule.endDate ?? "—"}`}
+                        {rule.active ? "Activo" : `Finalizado el ${rule.endDate ?? "—"}`}
                         {rule.exceptions.length > 0 && (
                           <>
                             {" · "}
@@ -105,7 +105,7 @@ export default function RecurringRulesPage() {
                               className="link-button"
                               onClick={() => setExpanded(expanded === rule.id ? null : rule.id)}
                             >
-                              {rule.exceptions.length} exceção(ões)
+                              {rule.exceptions.length} excepción(es)
                             </button>
                           </>
                         )}
@@ -113,15 +113,15 @@ export default function RecurringRulesPage() {
                       <td>
                         <div className="row-actions">
                           {rule.active && (
-                            <button onClick={() => setExceptionFor(rule)}>+ Exceção</button>
+                            <button onClick={() => setExceptionFor(rule)}>+ Excepción</button>
                           )}
                           <button onClick={() => startEdit(rule)}>Editar</button>
                           {rule.active ? (
-                            <button onClick={() => handleEnd(rule)}>Encerrar</button>
+                            <button onClick={() => handleEnd(rule)}>Finalizar</button>
                           ) : (
-                            <button onClick={() => handleReactivate(rule)}>Reativar</button>
+                            <button onClick={() => handleReactivate(rule)}>Reactivar</button>
                           )}
-                          <button onClick={() => handleRemove(rule)}>Apagar</button>
+                          <button onClick={() => handleRemove(rule)}>Eliminar</button>
                         </div>
                       </td>
                     </tr>
@@ -132,16 +132,16 @@ export default function RecurringRulesPage() {
                             {rule.exceptions.map((ex) => (
                               <li key={ex.date} style={{ marginBottom: 4 }}>
                                 <strong>{ex.date.split("-").reverse().join("/")}</strong> —{" "}
-                                {ex.action === "cancel" && "não vem"}
-                                {ex.action === "reassign" && `atende com ${ex.newProfessionalName}`}
-                                {ex.action === "reschedule" && `muda para ${ex.newTime}`}
+                                {ex.action === "cancel" && "no viene"}
+                                {ex.action === "reassign" && `atiende con ${ex.newProfessionalName}`}
+                                {ex.action === "reschedule" && `cambia para ${ex.newTime}`}
                                 {ex.note && ` (${ex.note})`}{" "}
                                 <button
                                   type="button"
                                   className="link-button"
                                   onClick={() => removeException(rule, ex.date)}
                                 >
-                                  remover
+                                  eliminar
                                 </button>
                               </li>
                             ))}

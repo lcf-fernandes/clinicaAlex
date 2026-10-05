@@ -66,11 +66,11 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!patientId) {
-      setError("Selecione um paciente da lista.");
+      setError("Seleccione un paciente de la lista.");
       return;
     }
     if (!professionalId) {
-      setError("Selecione um profissional.");
+      setError("Seleccione un profesional.");
       return;
     }
     const professional = professionals.find((p) => p.id === professionalId);
@@ -91,7 +91,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
         exceptions: initial?.exceptions ?? [],
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -99,7 +99,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>{initial ? "Editar paciente fixo" : "Novo paciente fixo"}</h2>
+      <h2>{initial ? "Editar paciente fijo" : "Nuevo paciente fijo"}</h2>
       {error && <div className="error-banner">{error}</div>}
 
       <div className="field" style={{ position: "relative" }}>
@@ -133,7 +133,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
 
       <div className="field-row">
         <div className="field">
-          <label htmlFor="weekday">Dia da semana</label>
+          <label htmlFor="weekday">Día de la semana</label>
           <select id="weekday" value={weekday} onChange={(e) => handleWeekdayChange(e.target.value as Weekday)}>
             {WEEKDAYS.map((w) => (
               <option key={w.key} value={w.key}>
@@ -143,19 +143,19 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
           </select>
         </div>
         <div className="field">
-          <label htmlFor="time">Horário</label>
+          <label htmlFor="time">Horario</label>
           <input id="time" type="time" value={time} onChange={(e) => handleTimeChange(e.target.value)} />
         </div>
       </div>
 
       <div className="field">
-        <label htmlFor="professional">Profissional</label>
+        <label htmlFor="professional">Profesional</label>
         <select
           id="professional"
           value={professionalId}
           onChange={(e) => setProfessionalId(e.target.value)}
         >
-          <option value="">— selecione —</option>
+          <option value="">— seleccione —</option>
           {availableProfessionals.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -164,8 +164,8 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
         </select>
         {availableProfessionals.length === 0 && (
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            Nenhum profissional disponível nesse dia/horário — ajuste a escala em Profissionais ou
-            escolha outro horário.
+            Ningún profesional disponible en ese día/horario — ajuste el horario en Profesionales o
+            elija otro horario.
           </span>
         )}
       </div>
@@ -178,7 +178,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
             value={billingProfileId}
             onChange={(e) => setBillingProfileId(e.target.value)}
           >
-            <option value="">— padrão do paciente —</option>
+            <option value="">— predeterminado del paciente —</option>
             {selectedPatient.billingProfiles.map((bp) => (
               <option key={bp.id} value={bp.id}>
                 {bp.name} ({bp.ruc})
@@ -189,7 +189,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
       )}
 
       <div className="field">
-        <label htmlFor="startDate">Começa em</label>
+        <label htmlFor="startDate">Empieza el</label>
         <input
           id="startDate"
           type="date"
@@ -201,7 +201,7 @@ export default function RecurringRuleForm({ initial, onSave, onCancel }: Props) 
 
       <div className="form-actions">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Salvando..." : "Salvar"}
+          {saving ? "Guardando..." : "Guardar"}
         </button>
         <button type="button" className="btn secondary" onClick={onCancel}>
           Cancelar

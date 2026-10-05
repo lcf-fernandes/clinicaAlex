@@ -22,7 +22,7 @@ export default function ExceptionModal({ rule, onSave, onClose }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (action === "reassign" && !newProfessionalId) {
-      setError("Selecione o profissional substituto.");
+      setError("Seleccione el profesional sustituto.");
       return;
     }
     setSaving(true);
@@ -39,7 +39,7 @@ export default function ExceptionModal({ rule, onSave, onClose }: Props) {
       });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -48,40 +48,40 @@ export default function ExceptionModal({ rule, onSave, onClose }: Props) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <form className="panel modal-panel" onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
-        <h2>Exceção — {rule.patientName}</h2>
+        <h2>Excepción — {rule.patientName}</h2>
         <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: -8 }}>
-          Vale só nessa data; a regra permanente ({rule.time}, {rule.professionalName}) continua valendo
-          nas outras semanas.
+          Vale solo para esa fecha; la regla permanente ({rule.time}, {rule.professionalName}) sigue
+          valiendo en las demás semanas.
         </p>
         {error && <div className="error-banner">{error}</div>}
 
         <div className="field">
-          <label htmlFor="exDate">Data</label>
+          <label htmlFor="exDate">Fecha</label>
           <input id="exDate" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
         </div>
 
         <div className="field">
-          <label htmlFor="exAction">O que acontece nessa data</label>
+          <label htmlFor="exAction">Qué pasa en esa fecha</label>
           <select
             id="exAction"
             value={action}
             onChange={(e) => setAction(e.target.value as RecurringExceptionAction)}
           >
-            <option value="cancel">Não vem (sem sessão nesse dia)</option>
-            <option value="reassign">Atende com outro profissional</option>
-            <option value="reschedule">Muda de horário</option>
+            <option value="cancel">No viene (sin sesión ese día)</option>
+            <option value="reassign">Atiende con otro profesional</option>
+            <option value="reschedule">Cambia de horario</option>
           </select>
         </div>
 
         {action === "reassign" && (
           <div className="field">
-            <label htmlFor="exProfessional">Profissional substituto</label>
+            <label htmlFor="exProfessional">Profesional sustituto</label>
             <select
               id="exProfessional"
               value={newProfessionalId}
               onChange={(e) => setNewProfessionalId(e.target.value)}
             >
-              <option value="">— selecione —</option>
+              <option value="">— seleccione —</option>
               {professionals
                 .filter((p) => p.active)
                 .map((p) => (
@@ -95,19 +95,19 @@ export default function ExceptionModal({ rule, onSave, onClose }: Props) {
 
         {action === "reschedule" && (
           <div className="field">
-            <label htmlFor="exTime">Novo horário</label>
+            <label htmlFor="exTime">Nuevo horario</label>
             <input id="exTime" type="time" value={newTime} onChange={(e) => setNewTime(e.target.value)} />
           </div>
         )}
 
         <div className="field">
-          <label htmlFor="exNote">Observação (opcional)</label>
+          <label htmlFor="exNote">Observación (opcional)</label>
           <input id="exNote" value={note} onChange={(e) => setNote(e.target.value)} />
         </div>
 
         <div className="form-actions">
           <button type="submit" className="btn" disabled={saving}>
-            {saving ? "Salvando..." : "Salvar exceção"}
+            {saving ? "Guardando..." : "Guardar excepción"}
           </button>
           <button type="button" className="btn secondary" onClick={onClose}>
             Cancelar
