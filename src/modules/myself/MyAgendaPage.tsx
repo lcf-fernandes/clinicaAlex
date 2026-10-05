@@ -19,10 +19,10 @@ export default function MyAgendaPage({ professionalId }: Props) {
             ← Anterior
           </button>
           <button className="btn secondary" onClick={() => setDate(todayISO())}>
-            Hoje
+            Hoy
           </button>
           <button className="btn secondary" onClick={() => setDate((d) => addDays(d, 1))}>
-            Próximo →
+            Siguiente →
           </button>
         </div>
       </div>
@@ -32,17 +32,17 @@ export default function MyAgendaPage({ professionalId }: Props) {
       {error && <div className="error-banner">{error}</div>}
 
       {loading ? (
-        <p>Carregando...</p>
+        <p>Cargando...</p>
       ) : sessions.length === 0 ? (
-        <div className="empty-state">Nenhuma sessão agendada para este dia.</div>
+        <div className="empty-state">Ninguna sesión agendada para este día.</div>
       ) : (
         <table>
           <thead>
             <tr>
-              <th>Horário</th>
+              <th>Horario</th>
               <th>Paciente</th>
-              <th>Status</th>
-              <th>Pagamento</th>
+              <th>Estado</th>
+              <th>Pago</th>
             </tr>
           </thead>
           <tbody>

@@ -11,7 +11,7 @@ interface Props {
 const ROLE_LABELS: Record<UserProfile["role"], string> = {
   admin: "Administrador",
   secretary: "Secretaria",
-  professional: "Profissional",
+  professional: "Profesional",
 };
 
 export default function UsersPage({ currentUid, isAdmin }: Props) {
@@ -23,7 +23,7 @@ export default function UsersPage({ currentUid, isAdmin }: Props) {
     return (
       <div>
         <div className="page-header">
-          <h1>Novo profissional</h1>
+          <h1>Nuevo profesional</h1>
         </div>
         <CreateUserForm
           allowedRoles={["professional"]}
@@ -55,7 +55,7 @@ function AdminUsersView({
   async function handleRemove(user: UserProfile) {
     if (
       confirm(
-        `Apagar o acesso de ${user.username}? A conta de login no Firebase Authentication continua existindo (requer remoção manual no Console) — isso só remove o acesso ao sistema.`
+        `¿Eliminar el acceso de ${user.username}? La cuenta de login en Firebase Authentication sigue existiendo (requiere eliminación manual en la Consola) — esto solo quita el acceso al sistema.`
       )
     ) {
       await removeUser(user);
@@ -65,10 +65,10 @@ function AdminUsersView({
   return (
     <div>
       <div className="page-header">
-        <h1>Usuários</h1>
+        <h1>Usuarios</h1>
         {!showForm && (
           <button className="btn" onClick={() => setShowForm(true)}>
-            + Novo usuário
+            + Nuevo usuario
           </button>
         )}
       </div>
@@ -78,16 +78,16 @@ function AdminUsersView({
       <div className={showForm ? "layout-split" : ""}>
         <div>
           {loading ? (
-            <p>Carregando...</p>
+            <p>Cargando...</p>
           ) : users.length === 0 ? (
-            <div className="empty-state">Nenhum usuário encontrado.</div>
+            <div className="empty-state">No se encontró ningún usuario.</div>
           ) : (
             <table>
               <thead>
                 <tr>
-                  <th>Usuário</th>
-                  <th>Papel</th>
-                  <th>Status</th>
+                  <th>Usuario</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
                   <th></th>
                 </tr>
               </thead>
@@ -101,14 +101,14 @@ function AdminUsersView({
                         {u.professionalName && ` (${u.professionalName})`}
                       </td>
                       <td>{ROLE_LABELS[u.role]}</td>
-                      <td>{u.active ? "Ativo" : "Bloqueado"}</td>
+                      <td>{u.active ? "Activo" : "Bloqueado"}</td>
                       <td>
                         <div className="row-actions">
                           <button disabled={isSelf} onClick={() => toggleActive(u)}>
                             {u.active ? "Bloquear" : "Desbloquear"}
                           </button>
                           <button disabled={isSelf} onClick={() => handleRemove(u)}>
-                            Apagar
+                            Eliminar
                           </button>
                         </div>
                       </td>
@@ -120,7 +120,7 @@ function AdminUsersView({
           )}
 
           <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 16 }}>
-            Você não pode bloquear ou apagar a própria conta.
+            No puede bloquear ni eliminar su propia cuenta.
           </p>
         </div>
 

@@ -15,7 +15,7 @@ interface Props {
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Administrador",
   secretary: "Secretaria",
-  professional: "Profissional (só visualiza a própria agenda/liquidação)",
+  professional: "Profesional (solo visualiza su propia agenda/liquidación)",
 };
 
 export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Props) {
@@ -32,15 +32,15 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
     e.preventDefault();
     const cleanUsername = username.trim();
     if (!cleanUsername || !email.trim() || !password) {
-      setError("Preencha usuário, e-mail e senha.");
+      setError("Complete usuario, e-mail y contraseña.");
       return;
     }
     if (password.length < 6) {
-      setError("A senha precisa ter pelo menos 6 caracteres (mínimo do Firebase).");
+      setError("La contraseña necesita tener al menos 6 caracteres (mínimo de Firebase).");
       return;
     }
     if (role === "professional" && !professionalId) {
-      setError("Selecione a qual profissional essa conta pertence.");
+      setError("Seleccione a qué profesional pertenece esta cuenta.");
       return;
     }
 
@@ -49,7 +49,7 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
     try {
       const usernameDoc = await getDoc(doc(db, "usernames", cleanUsername));
       if (usernameDoc.exists()) {
-        setError(`Já existe uma conta com o usuário "${cleanUsername}".`);
+        setError(`Ya existe una cuenta con el usuario "${cleanUsername}".`);
         setSaving(false);
         return;
       }
@@ -71,10 +71,10 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
 
       onCreated();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Erro ao criar usuário.";
+      const message = err instanceof Error ? err.message : "Error al crear usuario.";
       setError(
         message.includes("auth/email-already-in-use")
-          ? "Já existe uma conta de Authentication com esse e-mail."
+          ? "Ya existe una cuenta de Authentication con ese e-mail."
           : message
       );
     } finally {
@@ -84,11 +84,11 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>Novo usuário</h2>
+      <h2>Nuevo usuario</h2>
       {error && <div className="error-banner">{error}</div>}
 
       <div className="field">
-        <label htmlFor="newUsername">Usuário (pra digitar no login)</label>
+        <label htmlFor="newUsername">Usuario (para escribir en el login)</label>
         <input id="newUsername" value={username} onChange={(e) => setUsername(e.target.value)} />
       </div>
 
@@ -103,7 +103,7 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
       </div>
 
       <div className="field">
-        <label htmlFor="newPassword">Senha inicial</label>
+        <label htmlFor="newPassword">Contraseña inicial</label>
         <input
           id="newPassword"
           type="text"
@@ -115,7 +115,7 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
 
       {allowedRoles.length > 1 && (
         <div className="field">
-          <label htmlFor="newRole">Papel</label>
+          <label htmlFor="newRole">Rol</label>
           <select id="newRole" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
             {allowedRoles.map((value) => (
               <option key={value} value={value}>
@@ -128,13 +128,13 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
 
       {role === "professional" && (
         <div className="field">
-          <label htmlFor="newProfessional">Vincular ao profissional</label>
+          <label htmlFor="newProfessional">Vincular al profesional</label>
           <select
             id="newProfessional"
             value={professionalId}
             onChange={(e) => setProfessionalId(e.target.value)}
           >
-            <option value="">— selecione —</option>
+            <option value="">— seleccione —</option>
             {professionals
               .filter((p) => p.active)
               .map((p) => (
@@ -148,7 +148,7 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
 
       <div className="form-actions">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Criando..." : "Criar usuário"}
+          {saving ? "Creando..." : "Crear usuario"}
         </button>
         <button type="button" className="btn secondary" onClick={onCancel}>
           Cancelar

@@ -22,33 +22,33 @@ export default function MySettlementPage({ professionalId }: Props) {
             ← Anterior
           </button>
           <button className="btn secondary" onClick={() => setDate(todayISO())}>
-            Hoje
+            Hoy
           </button>
           <button className="btn secondary" onClick={() => setDate((d) => addDays(d, 1))}>
-            Próximo →
+            Siguiente →
           </button>
         </div>
       </div>
 
-      <h1 className="agenda-date-title">Liquidação — {formatLongDate(date)}</h1>
+      <h1 className="agenda-date-title">Liquidación — {formatLongDate(date)}</h1>
 
       {error && <div className="error-banner">{error}</div>}
 
       {loading ? (
-        <p>Carregando...</p>
+        <p>Cargando...</p>
       ) : !settlement ? (
         <div className="empty-state">
-          Liquidação ainda não disponível para este dia — fala com a secretaria.
+          Liquidación todavía no disponible para este día — hable con la secretaria.
         </div>
       ) : (
         <div className="panel" style={{ maxWidth: 420 }}>
           <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--text-muted)" }}>
-            {settlement.closedAt ? "Fechada" : "Ainda em aberto — valores podem mudar"}
+            {settlement.closedAt ? "Cerrada" : "Todavía abierta — los valores pueden cambiar"}
           </p>
           <table>
             <tbody>
               <tr>
-                <td>Sessões</td>
+                <td>Sesiones</td>
                 <td>{settlement.sessionsCount}</td>
               </tr>
               <tr>
@@ -60,7 +60,7 @@ export default function MySettlementPage({ professionalId }: Props) {
                 <td>− {formatGs(settlement.roomCost)}</td>
               </tr>
               <tr>
-                <td>Taxas</td>
+                <td>Tasas</td>
                 <td>− {formatGs(settlement.feesTotal)}</td>
               </tr>
               {settlement.adjustments.map((a) => (
@@ -71,7 +71,7 @@ export default function MySettlementPage({ professionalId }: Props) {
               ))}
               <tr>
                 <td>
-                  <strong>A receber</strong>
+                  <strong>A recibir</strong>
                 </td>
                 <td>
                   <strong>{formatGs(settlement.netAmount)}</strong>

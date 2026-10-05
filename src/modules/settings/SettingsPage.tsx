@@ -45,16 +45,16 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>Configurações</h1>
+        <h1>Configuración</h1>
       </div>
 
       <form className="panel" style={{ maxWidth: 480 }} onSubmit={handleSubmit}>
-        <h2>Salas / profissionais simultâneos por dia</h2>
+        <h2>Salas / profesionales simultáneos por día</h2>
         <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: -8 }}>
-          Quantas salas a clínica disponibiliza em cada dia da semana — a especificação original
-          cita 8 na maioria dos dias e 9 às quartas, mas isso é configurável aqui. É só um limite de
-          referência: a quantidade atual de profissionais escalados aparece do lado, mas nada impede
-          de passar do número se for preciso.
+          Cuántas salas la clínica tiene disponibles en cada día de la semana — la especificación
+          original menciona 8 en la mayoría de los días y 9 los miércoles, pero esto es configurable
+          acá. Es solo un límite de referencia: la cantidad actual de profesionales programados
+          aparece al lado, pero nada impide superar el número si hace falta.
         </p>
 
         {WEEKDAYS.map((w) => {
@@ -80,7 +80,7 @@ export default function SettingsPage() {
                   marginTop: 18,
                 }}
               >
-                {current} profissional(is) escalado(s) {overCapacity && "— acima do limite configurado"}
+                {current} profesional(es) programado(s) {overCapacity && "— por encima del límite configurado"}
               </span>
             </div>
           );
@@ -88,7 +88,7 @@ export default function SettingsPage() {
 
         <div className="form-actions">
           <button type="submit" className="btn" disabled={saving}>
-            {saving ? "Salvando..." : saved ? "Salvo!" : "Salvar"}
+            {saving ? "Guardando..." : saved ? "¡Guardado!" : "Guardar"}
           </button>
         </div>
       </form>
