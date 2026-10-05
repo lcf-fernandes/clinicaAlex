@@ -25,12 +25,12 @@ type Section =
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: "agenda", label: "Agenda" },
-  { key: "professionals", label: "Profissionais" },
+  { key: "professionals", label: "Profesionales" },
   { key: "patients", label: "Pacientes" },
-  { key: "recurring", label: "Pacientes fixos" },
+  { key: "recurring", label: "Pacientes fijos" },
   { key: "waitlist", label: "Lista de espera" },
-  { key: "payments", label: "Pagamentos" },
-  { key: "settlement", label: "Liquidação" },
+  { key: "payments", label: "Pagos" },
+  { key: "settlement", label: "Liquidación" },
 ];
 
 export default function App() {
@@ -38,7 +38,7 @@ export default function App() {
   const { user, profile, loading, signIn, signOut } = useAuth();
 
   if (loading) {
-    return <div className="app-loading">Carregando...</div>;
+    return <div className="app-loading">Cargando...</div>;
   }
 
   if (!user) {
@@ -52,8 +52,8 @@ export default function App() {
   const isAdmin = profile?.role === "admin";
   const sections = [
     ...SECTIONS,
-    { key: "users" as const, label: "Usuários" },
-    ...(isAdmin ? [{ key: "settings" as const, label: "Configurações" }] : []),
+    { key: "users" as const, label: "Usuarios" },
+    ...(isAdmin ? [{ key: "settings" as const, label: "Configuración" }] : []),
   ];
 
   return (
@@ -77,7 +77,7 @@ export default function App() {
             {profile && <span className="sidebar-role"> · {profile.role === "admin" ? "Administrador" : "Secretaria"}</span>}
           </span>
           <button className="btn secondary" onClick={signOut}>
-            Sair
+            Salir
           </button>
         </div>
       </aside>

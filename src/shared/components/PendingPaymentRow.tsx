@@ -39,7 +39,7 @@ export default function PendingPaymentRow({ sessionId, defaultAmount, onConfirm 
         style={{ width: 90 }}
       />
       <button type="button" onClick={confirm} disabled={saving}>
-        {saving ? "..." : "Marcar pago"}
+        {saving ? "..." : "Marcar pagado"}
       </button>
     </div>
   );

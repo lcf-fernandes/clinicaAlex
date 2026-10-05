@@ -45,7 +45,7 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!fullName.trim()) {
-      setError("Informe o nome do paciente.");
+      setError("Indique el nombre del paciente.");
       return;
     }
     setSaving(true);
@@ -58,7 +58,7 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
         billingProfiles,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -66,21 +66,21 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>{initial ? "Editar paciente" : "Novo paciente"}</h2>
+      <h2>{initial ? "Editar paciente" : "Nuevo paciente"}</h2>
       {error && <div className="error-banner">{error}</div>}
 
       <div className="field">
-        <label htmlFor="fullName">Nome completo</label>
+        <label htmlFor="fullName">Nombre completo</label>
         <input
           id="fullName"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Ex.: Juan Medina"
+          placeholder="Ej.: Juan Medina"
         />
       </div>
 
       <div className="field">
-        <label htmlFor="phone">Telefone</label>
+        <label htmlFor="phone">Teléfono</label>
         <input
           id="phone"
           value={phone}
@@ -90,17 +90,17 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label>Perfis de facturación</label>
+        <label>Perfiles de facturación</label>
         {billingProfiles.length === 0 && (
           <div className="empty-state" style={{ padding: 14, marginBottom: 8 }}>
-            Nenhum cadastrado. O paciente pode ter mais de um caso precise faturar em nomes diferentes.
+            Todavía no hay ninguno. El paciente puede tener más de uno si necesita facturar a nombres diferentes.
           </div>
         )}
         {billingProfiles.map((bp) => (
           <div className="billing-profile" key={bp.id}>
             <div className="field-row">
               <div className="field">
-                <label>Nome / razão social</label>
+                <label>Nombre / razón social</label>
                 <input
                   value={bp.name}
                   onChange={(e) => updateBillingProfile(bp.id, "name", e.target.value)}
@@ -123,21 +123,21 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
                   onChange={() => setDefaultBillingProfile(bp.id)}
                   style={{ width: "auto", marginRight: 6 }}
                 />
-                Padrão
+                Predeterminado
               </label>
               <button type="button" onClick={() => removeBillingProfile(bp.id)}>
-                Remover
+                Eliminar
               </button>
             </div>
           </div>
         ))}
         <button type="button" className="btn secondary" onClick={addBillingProfile}>
-          + Adicionar perfil de facturación
+          + Agregar perfil de facturación
         </button>
       </div>
 
       <div className="field">
-        <label htmlFor="notes">Observações</label>
+        <label htmlFor="notes">Observaciones</label>
         <textarea
           id="notes"
           rows={3}
@@ -148,7 +148,7 @@ export default function PatientForm({ initial, onSave, onCancel }: Props) {
 
       <div className="form-actions">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Salvando..." : "Salvar"}
+          {saving ? "Guardando..." : "Guardar"}
         </button>
         <button type="button" className="btn secondary" onClick={onCancel}>
           Cancelar

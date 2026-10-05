@@ -16,12 +16,12 @@ export default function ProfessionalApp({ profile, onSignOut }: Props) {
   if (!profile.professionalId) {
     return (
       <div className="app-loading" style={{ flexDirection: "column", gap: 12 }}>
-        <strong>Conta sem profissional vinculado.</strong>
+        <strong>Cuenta sin profesional vinculado.</strong>
         <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
-          Fala com a administração pra configurar o campo professionalId do seu usuário.
+          Hable con la administración para configurar el campo professionalId de su usuario.
         </span>
         <button className="btn secondary" onClick={onSignOut}>
-          Sair
+          Salir
         </button>
       </div>
     );
@@ -33,22 +33,22 @@ export default function ProfessionalApp({ profile, onSignOut }: Props) {
         <h1>Clínica Alex</h1>
         <nav>
           <button className={section === "agenda" ? "active" : ""} onClick={() => setSection("agenda")}>
-            Minha Agenda
+            Mi Agenda
           </button>
           <button
             className={section === "settlement" ? "active" : ""}
             onClick={() => setSection("settlement")}
           >
-            Minha Liquidação
+            Mi Liquidación
           </button>
         </nav>
         <div className="sidebar-footer">
           <span className="sidebar-user">
             {profile.professionalName ?? profile.username}
-            <span className="sidebar-role"> · Profissional</span>
+            <span className="sidebar-role"> · Profesional</span>
           </span>
           <button className="btn secondary" onClick={onSignOut}>
-            Sair
+            Salir
           </button>
         </div>
       </aside>

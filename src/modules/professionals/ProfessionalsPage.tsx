@@ -36,7 +36,7 @@ export default function ProfessionalsPage() {
   }
 
   async function handleRemove(p: Professional) {
-    if (confirm(`Remover ${p.name}? Sessões já registradas não são afetadas.`)) {
+    if (confirm(`¿Eliminar a ${p.name}? Las sesiones ya registradas no se ven afectadas.`)) {
       await removeProfessional(p.id);
     }
   }
@@ -44,10 +44,10 @@ export default function ProfessionalsPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>Profissionais</h1>
+        <h1>Profesionales</h1>
         {!showForm && (
           <button className="btn" onClick={startNew}>
-            + Novo profissional
+            + Nuevo profesional
           </button>
         )}
       </div>
@@ -57,31 +57,31 @@ export default function ProfessionalsPage() {
       <div className={showForm ? "layout-split" : ""}>
         <div>
           {loading ? (
-            <p>Carregando...</p>
+            <p>Cargando...</p>
           ) : professionals.length === 0 ? (
-            <div className="empty-state">Nenhum profissional cadastrado ainda.</div>
+            <div className="empty-state">Todavía no hay profesionales registrados.</div>
           ) : (
             <table>
               <thead>
                 <tr>
-                  <th>Nome</th>
-                  <th>Valor/sessão</th>
-                  <th>Sala/dia</th>
-                  <th>Taxa</th>
+                  <th>Nombre</th>
+                  <th>Valor/sesión</th>
+                  <th>Sala/día</th>
+                  <th>Tasa</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 {professionals.map((p) => (
                   <tr key={p.id} className={p.active ? "" : "inactive"}>
-                    <td>{p.name}{!p.active && " (inativo)"}</td>
+                    <td>{p.name}{!p.active && " (inactivo)"}</td>
                     <td>{p.sessionRate.toLocaleString("es-PY")} Gs</td>
                     <td>{p.roomCost.toLocaleString("es-PY")} Gs</td>
                     <td>{p.perSessionFee.toLocaleString("es-PY")} Gs</td>
                     <td>
                       <div className="row-actions">
                         <button onClick={() => startEdit(p)}>Editar</button>
-                        <button onClick={() => handleRemove(p)}>Remover</button>
+                        <button onClick={() => handleRemove(p)}>Eliminar</button>
                       </div>
                     </td>
                   </tr>

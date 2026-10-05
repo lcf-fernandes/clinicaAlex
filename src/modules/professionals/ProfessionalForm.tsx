@@ -64,7 +64,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setError("Informe o nome do profissional.");
+      setError("Indique el nombre del profesional.");
       return;
     }
     setSaving(true);
@@ -79,7 +79,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
         defaultSchedule: schedule,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -87,16 +87,16 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>{initial ? "Editar profissional" : "Novo profissional"}</h2>
+      <h2>{initial ? "Editar profesional" : "Nuevo profesional"}</h2>
       {error && <div className="error-banner">{error}</div>}
 
       <div className="field">
-        <label htmlFor="name">Nome</label>
+        <label htmlFor="name">Nombre</label>
         <input
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Ex.: Alicia"
+          placeholder="Ej.: Alicia"
         />
       </div>
 
@@ -108,13 +108,13 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
             onChange={(e) => setActive(e.target.checked)}
             style={{ width: "auto", marginRight: 6 }}
           />
-          Ativo
+          Activo
         </label>
       </div>
 
       <div className="field-row">
         <div className="field">
-          <label htmlFor="sessionRate">Valor por sessão (Gs)</label>
+          <label htmlFor="sessionRate">Valor por sesión (Gs)</label>
           <input
             id="sessionRate"
             type="number"
@@ -125,7 +125,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
           />
         </div>
         <div className="field">
-          <label htmlFor="roomCost">Custo de sala/dia (Gs)</label>
+          <label htmlFor="roomCost">Costo de sala/día (Gs)</label>
           <input
             id="roomCost"
             type="number"
@@ -136,7 +136,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
           />
         </div>
         <div className="field">
-          <label htmlFor="perSessionFee">Taxa por sessão (Gs)</label>
+          <label htmlFor="perSessionFee">Tasa por sesión (Gs)</label>
           <input
             id="perSessionFee"
             type="number"
@@ -149,7 +149,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label>Escala semanal habitual</label>
+        <label>Horario semanal habitual</label>
         <div className="schedule-grid">
           {WEEKDAYS.map(({ key, label }) => {
             const day = schedule[key];
@@ -203,7 +203,7 @@ export default function ProfessionalForm({ initial, onSave, onCancel }: Props) {
 
       <div className="form-actions">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Salvando..." : "Salvar"}
+          {saving ? "Guardando..." : "Guardar"}
         </button>
         <button type="button" className="btn secondary" onClick={onCancel}>
           Cancelar

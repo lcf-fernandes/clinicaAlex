@@ -5,9 +5,9 @@ export type PreferredTime = "manana" | "tarde" | "cualquiera";
 export type WaitlistStatus = "esperando" | "convertido" | "descartado";
 
 export const PREFERRED_TIME_LABELS: Record<PreferredTime, string> = {
-  manana: "Manhã",
+  manana: "Mañana",
   tarde: "Tarde",
-  cualquiera: "Qualquer horário",
+  cualquiera: "Cualquier horario",
 };
 
 export interface WaitlistEntry {

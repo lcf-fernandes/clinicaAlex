@@ -42,7 +42,7 @@ export default function PatientsPage() {
   async function handleRemove(p: Patient) {
     if (
       confirm(
-        `Remover a ficha de ${p.fullName}? O histórico de sessões dele não é apagado.`
+        `¿Eliminar la ficha de ${p.fullName}? El historial de sesiones no se borra.`
       )
     ) {
       await removePatient(p.id);
@@ -55,7 +55,7 @@ export default function PatientsPage() {
         <h1>Pacientes</h1>
         {!showForm && (
           <button className="btn" onClick={startNew}>
-            + Novo paciente
+            + Nuevo paciente
           </button>
         )}
       </div>
@@ -67,7 +67,7 @@ export default function PatientsPage() {
           {!showForm && (
             <div className="field" style={{ maxWidth: 320 }}>
               <input
-                placeholder="Buscar por nome ou telefone..."
+                placeholder="Buscar por nombre o teléfono..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -75,15 +75,15 @@ export default function PatientsPage() {
           )}
 
           {loading ? (
-            <p>Carregando...</p>
+            <p>Cargando...</p>
           ) : filtered.length === 0 ? (
-            <div className="empty-state">Nenhum paciente encontrado.</div>
+            <div className="empty-state">No se encontró ningún paciente.</div>
           ) : (
             <table>
               <thead>
                 <tr>
-                  <th>Nome</th>
-                  <th>Telefone</th>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
                   <th>Facturación</th>
                   <th></th>
                 </tr>
@@ -99,14 +99,14 @@ export default function PatientsPage() {
                         {defaultBilling
                           ? `${defaultBilling.name} (${defaultBilling.ruc})`
                           : p.billingProfiles.length > 0
-                          ? `${p.billingProfiles.length} perfis`
+                          ? `${p.billingProfiles.length} perfiles`
                           : "—"}
                       </td>
                       <td>
                         <div className="row-actions">
-                          <button onClick={() => setHistoryOf(p)}>Histórico</button>
+                          <button onClick={() => setHistoryOf(p)}>Historial</button>
                           <button onClick={() => startEdit(p)}>Editar</button>
-                          <button onClick={() => handleRemove(p)}>Remover</button>
+                          <button onClick={() => handleRemove(p)}>Eliminar</button>
                         </div>
                       </td>
                     </tr>

@@ -31,10 +31,10 @@ export default class ErrorBoundary extends Component<Props, State> {
         this.state.error.message.toLowerCase().includes("firebase");
       return (
         <div className="app-loading" style={{ flexDirection: "column", gap: 12, padding: 24, textAlign: "center" }}>
-          <strong>Não foi possível carregar a aplicação.</strong>
+          <strong>No fue posible cargar la aplicación.</strong>
           <span style={{ maxWidth: 480, fontSize: 13, color: "var(--text-muted)" }}>
             {missingFirebaseEnv
-              ? "Parece que as variáveis de ambiente do Firebase (VITE_FIREBASE_*) não estão configuradas neste ambiente. Confira o README (seção Rodando localmente) ou as variáveis de ambiente do projeto na Vercel."
+              ? "Parece que faltan configurar las variables de entorno de Firebase (VITE_FIREBASE_*) en este ambiente. Revise el README (sección Rodando localmente) o las variables de entorno del proyecto en Vercel."
               : this.state.error.message}
           </span>
         </div>

@@ -26,7 +26,7 @@ export default function LoginPage({ onSignIn }: Props) {
         String((err as { code: unknown }).code).startsWith("auth/");
       setError(
         isFirebaseAuthError || !(err instanceof Error)
-          ? "Usuário ou senha inválidos."
+          ? "Usuario o contraseña inválidos."
           : err.message
       );
     } finally {
@@ -38,12 +38,12 @@ export default function LoginPage({ onSignIn }: Props) {
     <div className="login-screen">
       <form className="panel login-panel" onSubmit={handleSubmit}>
         <h1 className="login-title">Clínica Alex</h1>
-        <p className="login-subtitle">Entre para acessar a agenda</p>
+        <p className="login-subtitle">Ingrese para acceder a la agenda</p>
 
         {error && <div className="error-banner">{error}</div>}
 
         <div className="field">
-          <label htmlFor="username">Usuário</label>
+          <label htmlFor="username">Usuario</label>
           <input
             id="username"
             type="text"
@@ -55,7 +55,7 @@ export default function LoginPage({ onSignIn }: Props) {
         </div>
 
         <div className="field">
-          <label htmlFor="password">Senha</label>
+          <label htmlFor="password">Contraseña</label>
           <input
             id="password"
             type="password"
@@ -67,7 +67,7 @@ export default function LoginPage({ onSignIn }: Props) {
         </div>
 
         <button type="submit" className="btn" style={{ width: "100%" }} disabled={loading}>
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
     </div>
