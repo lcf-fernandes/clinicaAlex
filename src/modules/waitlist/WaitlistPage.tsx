@@ -19,7 +19,7 @@ export default function WaitlistPage() {
   }
 
   async function handleRemove(id: string, name: string) {
-    if (confirm(`Remover ${name} da lista de espera?`)) {
+    if (confirm(`¿Eliminar a ${name} de la lista de espera?`)) {
       await removeEntry(id);
     }
   }
@@ -30,7 +30,7 @@ export default function WaitlistPage() {
         <h1>Lista de espera</h1>
         {!showForm && (
           <button className="btn" onClick={() => setShowForm(true)}>
-            + Adicionar à lista
+            + Agregar a la lista
           </button>
         )}
       </div>
@@ -40,19 +40,19 @@ export default function WaitlistPage() {
       <div className={showForm ? "layout-split" : ""}>
         <div>
           {loading ? (
-            <p>Carregando...</p>
+            <p>Cargando...</p>
           ) : entries.length === 0 ? (
-            <div className="empty-state">Ninguém na lista de espera no momento.</div>
+            <div className="empty-state">Nadie en la lista de espera por el momento.</div>
           ) : (
             <>
               <table>
                 <thead>
                   <tr>
                     <th>Paciente</th>
-                    <th>Preferência</th>
-                    <th>Profissional</th>
-                    <th>Dias</th>
-                    <th>Observação</th>
+                    <th>Preferencia</th>
+                    <th>Profesional</th>
+                    <th>Días</th>
+                    <th>Observación</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -61,17 +61,17 @@ export default function WaitlistPage() {
                     <tr key={e.id}>
                       <td>{e.patientName}</td>
                       <td>{PREFERRED_TIME_LABELS[e.preferredTime]}</td>
-                      <td>{e.preferredProfessionalName ?? "— qualquer —"}</td>
+                      <td>{e.preferredProfessionalName ?? "— cualquiera —"}</td>
                       <td>
                         {e.preferredDays.length === 0
-                          ? "qualquer dia"
+                          ? "cualquier día"
                           : e.preferredDays.map((d) => WEEKDAY_LABEL[d]).join(", ")}
                       </td>
                       <td>{e.observation ?? "—"}</td>
                       <td>
                         <div className="row-actions">
                           <button onClick={() => setStatus(e.id, "descartado")}>Descartar</button>
-                          <button onClick={() => handleRemove(e.id, e.patientName)}>Remover</button>
+                          <button onClick={() => handleRemove(e.id, e.patientName)}>Eliminar</button>
                         </div>
                       </td>
                     </tr>
@@ -89,13 +89,13 @@ export default function WaitlistPage() {
                       {others.map((e) => (
                         <tr key={e.id} className="inactive">
                           <td>{e.patientName}</td>
-                          <td>{e.status === "convertido" ? "Convertido em sessão" : "Descartado"}</td>
+                          <td>{e.status === "convertido" ? "Convertido en sesión" : "Descartado"}</td>
                           <td>
                             <div className="row-actions">
                               {e.status === "descartado" && (
-                                <button onClick={() => setStatus(e.id, "esperando")}>Reativar</button>
+                                <button onClick={() => setStatus(e.id, "esperando")}>Reactivar</button>
                               )}
-                              <button onClick={() => handleRemove(e.id, e.patientName)}>Remover</button>
+                              <button onClick={() => handleRemove(e.id, e.patientName)}>Eliminar</button>
                             </div>
                           </td>
                         </tr>

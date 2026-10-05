@@ -40,7 +40,7 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!patientId) {
-      setError("Selecione um paciente da lista.");
+      setError("Seleccione un paciente de la lista.");
       return;
     }
     const professional = professionals.find((p) => p.id === preferredProfessionalId);
@@ -58,7 +58,7 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
         status: "esperando",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -66,7 +66,7 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
 
   return (
     <form className="panel" onSubmit={handleSubmit}>
-      <h2>Adicionar à lista de espera</h2>
+      <h2>Agregar a la lista de espera</h2>
       {error && <div className="error-banner">{error}</div>}
 
       <div className="field" style={{ position: "relative" }}>
@@ -98,7 +98,7 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label htmlFor="preferredTime">Preferência de horário</label>
+        <label htmlFor="preferredTime">Preferencia de horario</label>
         <select
           id="preferredTime"
           value={preferredTime}
@@ -113,13 +113,13 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label htmlFor="preferredProfessional">Profissional preferido (opcional)</label>
+        <label htmlFor="preferredProfessional">Profesional preferido (opcional)</label>
         <select
           id="preferredProfessional"
           value={preferredProfessionalId}
           onChange={(e) => setPreferredProfessionalId(e.target.value)}
         >
-          <option value="">— qualquer um —</option>
+          <option value="">— cualquiera —</option>
           {professionals
             .filter((p) => p.active)
             .map((p) => (
@@ -131,7 +131,7 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label>Dias preferidos (nenhum selecionado = qualquer dia)</label>
+        <label>Días preferidos (ninguno seleccionado = cualquier día)</label>
         <div className="weekday-checkboxes">
           {WEEKDAYS.map((w) => (
             <label key={w.key} className="weekday-checkbox">
@@ -147,18 +147,18 @@ export default function WaitlistForm({ onSave, onCancel }: Props) {
       </div>
 
       <div className="field">
-        <label htmlFor="observation">Observação (opcional)</label>
+        <label htmlFor="observation">Observación (opcional)</label>
         <input
           id="observation"
           value={observation}
           onChange={(e) => setObservation(e.target.value)}
-          placeholder="Qualquer horário por la tarde, prefere lunes..."
+          placeholder="Cualquier horario por la tarde, prefiere los lunes..."
         />
       </div>
 
       <div className="form-actions">
         <button type="submit" className="btn" disabled={saving}>
-          {saving ? "Salvando..." : "Adicionar"}
+          {saving ? "Guardando..." : "Agregar"}
         </button>
         <button type="button" className="btn secondary" onClick={onCancel}>
           Cancelar
