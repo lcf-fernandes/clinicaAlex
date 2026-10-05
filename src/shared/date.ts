@@ -31,11 +31,11 @@ export function weekdayOf(iso: string): Weekday {
 
 const WEEKDAY_NAMES = [
   "domingo",
-  "segunda-feira",
-  "terça-feira",
-  "quarta-feira",
-  "quinta-feira",
-  "sexta-feira",
+  "lunes",
+  "martes",
+  "miércoles",
+  "jueves",
+  "viernes",
   "sábado",
 ];
 
@@ -43,7 +43,7 @@ export function formatLongDate(iso: string): string {
   const date = fromISO(iso);
   const weekday = WEEKDAY_NAMES[date.getDay()];
   const day = date.getDate();
-  const month = date.toLocaleDateString("pt-BR", { month: "long" });
+  const month = date.toLocaleDateString("es-PY", { month: "long" });
   const year = date.getFullYear();
   return `${weekday}, ${day} de ${month} de ${year}`;
 }

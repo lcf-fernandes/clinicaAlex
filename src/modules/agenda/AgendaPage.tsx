@@ -129,7 +129,7 @@ export default function AgendaPage() {
   }
 
   async function handleRemoveBlock(block: Block) {
-    if (confirm(`Remover o bloqueio${block.reason ? ` "${block.reason}"` : ""}?`)) {
+    if (confirm(`¿Eliminar el bloqueo${block.reason ? ` "${block.reason}"` : ""}?`)) {
       await removeBlock(block.id);
     }
   }
@@ -177,21 +177,21 @@ export default function AgendaPage() {
             ← Anterior
           </button>
           <button className="btn secondary" onClick={() => setDate(todayISO())}>
-            Hoje
+            Hoy
           </button>
           <button className="btn secondary" onClick={() => setDate((d) => addDays(d, 1))}>
-            Próximo →
+            Siguiente →
           </button>
         </div>
         <div className="row-actions">
           {scheduledProfessionals.filter((p) => !absentIds.has(p.id)).length > 0 && (
             <button className="btn secondary" onClick={() => setAbsenceModal(true)}>
-              + Profissional ausente
+              + Profesional ausente
             </button>
           )}
           {columns.length > 0 && (
             <button className="btn secondary" onClick={() => setBlockModal(true)}>
-              + Bloquear horário
+              + Bloquear horario
             </button>
           )}
           {columns.length > 0 && (
@@ -221,10 +221,10 @@ export default function AgendaPage() {
       ))}
 
       {loading ? (
-        <p>Carregando...</p>
+        <p>Cargando...</p>
       ) : columns.length === 0 ? (
         <div className="empty-state">
-          Nenhum profissional escalado para este dia. Configure a escala semanal em Profissionais.
+          Ningún profesional está programado para este día. Configure el horario semanal en Profesionales.
         </div>
       ) : (
         <div className="agenda-scroll">
@@ -324,7 +324,7 @@ export default function AgendaPage() {
                     style={{ gridRow, gridColumn }}
                     onClick={() => openCreate(prof, t)}
                   >
-                    Disponível
+                    Disponible
                   </button>
                 );
               });

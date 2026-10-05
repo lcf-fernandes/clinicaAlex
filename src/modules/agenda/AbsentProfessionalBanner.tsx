@@ -40,7 +40,7 @@ function SessionActionRow({
   }
 
   async function handleCancel() {
-    if (!confirm(`Cancelar a sessão de ${session.patientName} (${session.startTime})?`)) return;
+    if (!confirm(`¿Cancelar la sesión de ${session.patientName} (${session.startTime})?`)) return;
     setSaving(true);
     try {
       await onCancelSession(session);
@@ -55,7 +55,7 @@ function SessionActionRow({
         {session.startTime} — {session.patientName}
       </span>
       <select value={targetId} onChange={(e) => setTargetId(e.target.value)} disabled={saving}>
-        <option value="">— manter pendente —</option>
+        <option value="">— mantener pendiente —</option>
         {replacementOptions.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
@@ -66,7 +66,7 @@ function SessionActionRow({
         Transferir
       </button>
       <button type="button" onClick={handleCancel} disabled={saving}>
-        Cancelar sessão
+        Cancelar sesión
       </button>
     </div>
   );
@@ -84,20 +84,20 @@ export default function AbsentProfessionalBanner({
     <div className="absence-banner">
       <div className="absence-banner-header">
         <div>
-          <strong>{exception.professionalName}</strong> está ausente hoje
+          <strong>{exception.professionalName}</strong> está ausente hoy
           {exception.reason && ` — ${exception.reason}`}
           {exception.replacementProfessionalName && (
             <> · reemplazo: {exception.replacementProfessionalName}</>
           )}
         </div>
         <button type="button" className="link-button" onClick={onRemoveException}>
-          desfazer ausência
+          deshacer ausencia
         </button>
       </div>
 
       {sessions.length === 0 ? (
         <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "6px 0 0" }}>
-          Nenhum paciente estava agendado com {exception.professionalName} nesse dia.
+          Ningún paciente estaba agendado con {exception.professionalName} en ese día.
         </p>
       ) : (
         <div className="absence-session-list">

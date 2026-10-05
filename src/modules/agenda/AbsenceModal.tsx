@@ -28,7 +28,7 @@ export default function AbsenceModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!professionalId) {
-      setError("Selecione quem vai faltar.");
+      setError("Seleccione quién va a faltar.");
       return;
     }
     const professional = scheduledProfessionals.find((p) => p.id === professionalId);
@@ -46,7 +46,7 @@ export default function AbsenceModal({
       });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -55,11 +55,11 @@ export default function AbsenceModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <form className="panel modal-panel" onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
-        <h2>Profissional ausente</h2>
+        <h2>Profesional ausente</h2>
         {error && <div className="error-banner">{error}</div>}
 
         <div className="field">
-          <label htmlFor="absentProfessional">Quem vai faltar</label>
+          <label htmlFor="absentProfessional">Quién va a faltar</label>
           <select
             id="absentProfessional"
             value={professionalId}
@@ -79,7 +79,7 @@ export default function AbsenceModal({
             id="reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Doença, viagem, etc."
+            placeholder="Enfermedad, viaje, etc."
           />
         </div>
 
@@ -90,7 +90,7 @@ export default function AbsenceModal({
             value={replacementProfessionalId}
             onChange={(e) => setReplacementProfessionalId(e.target.value)}
           >
-            <option value="">— sem reemplazo —</option>
+            <option value="">— sin reemplazo —</option>
             {replacementOptions.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -98,14 +98,14 @@ export default function AbsenceModal({
             ))}
           </select>
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            Se escolher alguém, ele(a) aparece na agenda desse dia usando o horário do profissional
-            ausente. Os pacientes já agendados você decide um a um: manter, transferir ou cancelar.
+            Si elige a alguien, esa persona aparece en la agenda de ese día usando el horario del
+            profesional ausente. Las sesiones ya agendadas se deciden una por una: mantener, transferir o cancelar.
           </span>
         </div>
 
         <div className="form-actions">
           <button type="submit" className="btn" disabled={saving}>
-            {saving ? "Salvando..." : "Confirmar ausência"}
+            {saving ? "Guardando..." : "Confirmar ausencia"}
           </button>
           <button type="button" className="btn secondary" onClick={onClose}>
             Cancelar

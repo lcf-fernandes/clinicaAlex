@@ -84,14 +84,14 @@ export default function SessionModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!patientId) {
-      setError("Selecione um paciente da lista.");
+      setError("Seleccione un paciente de la lista.");
       return;
     }
     const conflict = occupied.some((o) =>
       rangesOverlap(startTime, durationMinutes, o.startTime, o.durationMinutes)
     );
     if (conflict) {
-      setError("Esse horário conflita com outra sessão ou bloqueio já existente.");
+      setError("Ese horario tiene conflicto con otra sesión o bloqueo ya existente.");
       return;
     }
     setSaving(true);
@@ -116,7 +116,7 @@ export default function SessionModal({
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -124,13 +124,13 @@ export default function SessionModal({
 
   async function handleDelete() {
     if (!onDelete) return;
-    if (!confirm("Remover esta sessão? O horário fica disponível de novo.")) return;
+    if (!confirm("¿Eliminar esta sesión? El horario queda disponible de nuevo.")) return;
     setSaving(true);
     try {
       await onDelete();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao remover.");
+      setError(err instanceof Error ? err.message : "Error al eliminar.");
       setSaving(false);
     }
   }
@@ -139,13 +139,13 @@ export default function SessionModal({
     <div className="modal-overlay" onClick={onClose}>
       <form className="panel modal-panel" onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
         <h2>
-          {existing ? "Editar sessão" : "Nova sessão"} — {professionalName}
+          {existing ? "Editar sesión" : "Nueva sesión"} — {professionalName}
         </h2>
         {error && <div className="error-banner">{error}</div>}
 
         {!existing && waitlistMatches && waitlistMatches.length > 0 && (
           <div className="field">
-            <label>Da lista de espera</label>
+            <label>De la lista de espera</label>
             <div className="waitlist-suggestions">
               {waitlistMatches.map((entry) => (
                 <button
@@ -191,7 +191,7 @@ export default function SessionModal({
 
         <div className="field-row">
           <div className="field">
-            <label htmlFor="startTime">Horário</label>
+            <label htmlFor="startTime">Horario</label>
             <input
               id="startTime"
               type="time"
@@ -200,20 +200,20 @@ export default function SessionModal({
             />
           </div>
           <div className="field">
-            <label htmlFor="duration">Duração</label>
+            <label htmlFor="duration">Duración</label>
             <select
               id="duration"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(Number(e.target.value))}
             >
               <option value={60}>60 min</option>
-              <option value={120}>120 min (sessão dupla)</option>
+              <option value={120}>120 min (sesión doble)</option>
             </select>
           </div>
         </div>
 
         <div className="field">
-          <label htmlFor="status">Status</label>
+          <label htmlFor="status">Estado</label>
           <select id="status" value={status} onChange={(e) => setStatus(e.target.value as SessionStatus)}>
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -225,13 +225,13 @@ export default function SessionModal({
 
         <div className="field-row">
           <div className="field">
-            <label htmlFor="paymentMethod">Pagamento</label>
+            <label htmlFor="paymentMethod">Pago</label>
             <select
               id="paymentMethod"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod | "")}
             >
-              <option value="">— não registrado —</option>
+              <option value="">— no registrado —</option>
               {Object.entries(PAYMENT_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
@@ -240,7 +240,7 @@ export default function SessionModal({
             </select>
           </div>
           <div className="field">
-            <label htmlFor="paymentAmount">Valor (Gs)</label>
+            <label htmlFor="paymentAmount">Monto (Gs)</label>
             <input
               id="paymentAmount"
               type="number"
@@ -254,17 +254,17 @@ export default function SessionModal({
         </div>
 
         <div className="field">
-          <label htmlFor="notes">Observações</label>
+          <label htmlFor="notes">Observaciones</label>
           <textarea id="notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </div>
 
         <div className="form-actions">
           <button type="submit" className="btn" disabled={saving}>
-            {saving ? "Salvando..." : "Salvar"}
+            {saving ? "Guardando..." : "Guardar"}
           </button>
           {existing && onDelete && (
             <button type="button" className="btn danger" onClick={handleDelete} disabled={saving}>
-              Remover
+              Eliminar
             </button>
           )}
           <button type="button" className="btn secondary" onClick={onClose}>

@@ -39,11 +39,11 @@ export default function BlockModal({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!professionalId) {
-      setError("Selecione um profissional.");
+      setError("Seleccione un profesional.");
       return;
     }
     if (endTime <= startTime) {
-      setError("O horário final precisa ser depois do inicial.");
+      setError("El horario final tiene que ser después del inicial.");
       return;
     }
     setSaving(true);
@@ -58,7 +58,7 @@ export default function BlockModal({
       });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
     } finally {
       setSaving(false);
     }
@@ -67,11 +67,11 @@ export default function BlockModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <form className="panel modal-panel" onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
-        <h2>Bloquear horário</h2>
+        <h2>Bloquear horario</h2>
         {error && <div className="error-banner">{error}</div>}
 
         <div className="field">
-          <label htmlFor="professional">Profissional</label>
+          <label htmlFor="professional">Profesional</label>
           <select
             id="professional"
             value={professionalId}
@@ -87,7 +87,7 @@ export default function BlockModal({
 
         <div className="field-row">
           <div className="field">
-            <label htmlFor="startTime">Início</label>
+            <label htmlFor="startTime">Inicio</label>
             <input
               id="startTime"
               type="time"
@@ -96,7 +96,7 @@ export default function BlockModal({
             />
           </div>
           <div className="field">
-            <label htmlFor="endTime">Fim</label>
+            <label htmlFor="endTime">Fin</label>
             <input id="endTime" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function BlockModal({
 
         <div className="form-actions">
           <button type="submit" className="btn" disabled={saving}>
-            {saving ? "Salvando..." : "Bloquear"}
+            {saving ? "Guardando..." : "Bloquear"}
           </button>
           <button type="button" className="btn secondary" onClick={onClose}>
             Cancelar
