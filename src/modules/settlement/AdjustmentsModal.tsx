@@ -17,7 +17,7 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
 
   function addItem() {
     if (!concept.trim()) {
-      setError("Informe o conceito do ajuste.");
+      setError("Indique el concepto del ajuste.");
       return;
     }
     setError(null);
@@ -39,7 +39,7 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
       await onSave(items);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao salvar.");
+      setError(err instanceof Error ? err.message : "Error al guardar.");
       setSaving(false);
     }
   }
@@ -63,7 +63,7 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
                 <span>
                   {i.amount.toLocaleString("es-PY")} Gs{" "}
                   <button type="button" className="link-button" onClick={() => removeItem(i.id)}>
-                    remover
+                    eliminar
                   </button>
                 </span>
               </li>
@@ -73,7 +73,7 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
 
         <div className="field-row">
           <div className="field">
-            <label htmlFor="concept">Conceito</label>
+            <label htmlFor="concept">Concepto</label>
             <input
               id="concept"
               value={concept}
@@ -82,7 +82,7 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
             />
           </div>
           <div className="field">
-            <label htmlFor="amount">Valor (Gs)</label>
+            <label htmlFor="amount">Monto (Gs)</label>
             <input
               id="amount"
               type="number"
@@ -93,16 +93,16 @@ export default function AdjustmentsModal({ professionalName, adjustments, onSave
           </div>
         </div>
         <button type="button" className="btn secondary" onClick={addItem} style={{ marginBottom: 16 }}>
-          + Adicionar ajuste
+          + Agregar ajuste
         </button>
 
         <p style={{ fontSize: 12.5, color: "var(--text-muted)" }}>
-          Total de ajustes: {total.toLocaleString("es-PY")} Gs (descontado do valor a receber)
+          Total de ajustes: {total.toLocaleString("es-PY")} Gs (se descuenta del monto a recibir)
         </p>
 
         <div className="form-actions">
           <button type="button" className="btn" onClick={handleSave} disabled={saving}>
-            {saving ? "Salvando..." : "Salvar ajustes"}
+            {saving ? "Guardando..." : "Guardar ajustes"}
           </button>
           <button type="button" className="btn secondary" onClick={onClose}>
             Cancelar

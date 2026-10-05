@@ -105,7 +105,7 @@ export default function SettlementPage() {
 
   async function handleCloseRow(row: Row) {
     if (!row.professional) return;
-    if (!confirm(`Fechar a liquidação de ${row.professionalName}? Os valores ficam travados a partir daqui.`))
+    if (!confirm(`¿Cerrar la liquidación de ${row.professionalName}? Los valores quedan bloqueados a partir de ahora.`))
       return;
     await closeSettlement(row.professionalId, row.professionalName, row.adjustments, {
       sessionsCount: row.sessionsCount,
@@ -123,7 +123,7 @@ export default function SettlementPage() {
 
   async function handleCloseAll() {
     if (openRows.length === 0) return;
-    if (!confirm(`Fechar a liquidação do dia inteiro (${openRows.length} profissional(is))? Os valores ficam travados.`))
+    if (!confirm(`¿Cerrar la liquidación del día entero (${openRows.length} profesional(es))? Los valores quedan bloqueados.`))
       return;
     for (const row of openRows) {
       if (!row.professional) continue;
@@ -146,38 +146,38 @@ export default function SettlementPage() {
             ← Anterior
           </button>
           <button className="btn secondary" onClick={() => setDate(todayISO())}>
-            Hoje
+            Hoy
           </button>
           <button className="btn secondary" onClick={() => setDate((d) => addDays(d, 1))}>
-            Próximo →
+            Siguiente →
           </button>
         </div>
         {openRows.length > 0 && (
           <button className="btn" onClick={handleCloseAll}>
-            Fechar liquidação do dia
+            Cerrar liquidación del día
           </button>
         )}
       </div>
 
-      <h1 className="agenda-date-title">Liquidação — {formatLongDate(date)}</h1>
+      <h1 className="agenda-date-title">Liquidación — {formatLongDate(date)}</h1>
 
       {loading ? (
-        <p>Carregando...</p>
+        <p>Cargando...</p>
       ) : rows.length === 0 ? (
-        <div className="empty-state">Nenhuma sessão realizada (Asistió) registrada nesse dia ainda.</div>
+        <div className="empty-state">Todavía no hay ninguna sesión realizada (Asistió) registrada ese día.</div>
       ) : (
         <>
           <table>
             <thead>
               <tr>
-                <th>Profissional</th>
-                <th>Sessões</th>
+                <th>Profesional</th>
+                <th>Sesiones</th>
                 <th>Bruto</th>
                 <th>Sala</th>
-                <th>Taxas</th>
+                <th>Tasas</th>
                 <th>Ajustes</th>
-                <th>A receber</th>
-                <th>Status</th>
+                <th>A recibir</th>
+                <th>Estado</th>
                 <th></th>
               </tr>
             </thead>
@@ -193,13 +193,13 @@ export default function SettlementPage() {
                   <td>
                     <strong>{formatGs(row.netAmount)}</strong>
                   </td>
-                  <td>{row.closed ? "Fechada" : "Aberta"}</td>
+                  <td>{row.closed ? "Cerrada" : "Abierta"}</td>
                   <td>
                     <div className="row-actions">
                       {!row.closed && (
                         <>
                           <button onClick={() => setAdjustmentsFor(row)}>Ajustes</button>
-                          <button onClick={() => handleCloseRow(row)}>Fechar</button>
+                          <button onClick={() => handleCloseRow(row)}>Cerrar</button>
                         </>
                       )}
                       {row.closed && <button onClick={() => handleReopenRow(row)}>Reabrir</button>}
@@ -211,7 +211,7 @@ export default function SettlementPage() {
           </table>
 
           <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 12 }}>
-            Total líquido do dia (todos os profissionais): <strong>{formatGs(totalNet)}</strong>
+            Total líquido del día (todos los profesionales): <strong>{formatGs(totalNet)}</strong>
           </p>
         </>
       )}

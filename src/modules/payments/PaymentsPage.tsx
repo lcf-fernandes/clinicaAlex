@@ -14,29 +14,29 @@ export default function PaymentsPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>Pagamentos pendentes</h1>
+        <h1>Pagos pendientes</h1>
       </div>
 
       {error && <div className="error-banner">{error}</div>}
 
       {!loading && sessions.length > 0 && (
         <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: -10, marginBottom: 16 }}>
-          {sessions.length} pendência(s) · total em aberto: {totalPendente.toLocaleString("es-PY")} Gs
+          {sessions.length} pendencia(s) · total pendiente: {totalPendente.toLocaleString("es-PY")} Gs
         </p>
       )}
 
       {loading ? (
-        <p>Carregando...</p>
+        <p>Cargando...</p>
       ) : sessions.length === 0 ? (
-        <div className="empty-state">Nenhum pagamento pendente no momento.</div>
+        <div className="empty-state">Ningún pago pendiente por el momento.</div>
       ) : (
         <table>
           <thead>
             <tr>
-              <th>Data</th>
+              <th>Fecha</th>
               <th>Paciente</th>
-              <th>Profissional</th>
-              <th>Marcar como pago</th>
+              <th>Profesional</th>
+              <th>Marcar como pagado</th>
             </tr>
           </thead>
           <tbody>
