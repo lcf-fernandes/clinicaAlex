@@ -6,6 +6,7 @@ import PaymentsPage from "./modules/payments/PaymentsPage";
 import RecurringRulesPage from "./modules/recurring/RecurringRulesPage";
 import WaitlistPage from "./modules/waitlist/WaitlistPage";
 import SettlementPage from "./modules/settlement/SettlementPage";
+import MonthlyReportPage from "./modules/reports/MonthlyReportPage";
 import UsersPage from "./modules/users/UsersPage";
 import SettingsPage from "./modules/settings/SettingsPage";
 import LoginPage from "./modules/auth/LoginPage";
@@ -20,6 +21,7 @@ type Section =
   | "waitlist"
   | "payments"
   | "settlement"
+  | "reports"
   | "users"
   | "settings";
 
@@ -31,6 +33,7 @@ const SECTIONS: { key: Section; label: string }[] = [
   { key: "waitlist", label: "Lista de espera" },
   { key: "payments", label: "Pagos" },
   { key: "settlement", label: "Liquidación" },
+  { key: "reports", label: "Reporte mensual" },
 ];
 
 export default function App() {
@@ -89,6 +92,7 @@ export default function App() {
         {section === "waitlist" && <WaitlistPage />}
         {section === "payments" && <PaymentsPage />}
         {section === "settlement" && <SettlementPage />}
+        {section === "reports" && <MonthlyReportPage />}
         {section === "users" && <UsersPage currentUid={user.uid} isAdmin={isAdmin} />}
         {section === "settings" && isAdmin && <SettingsPage />}
       </div>

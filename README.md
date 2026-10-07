@@ -182,6 +182,17 @@ navegador. Um `@media print` em `index.css` esconde a sidebar, os
 botões de navegação e os controles interativos do banner de ausência,
 e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
 
+## Reporte mensual
+
+Resolve o que a especificação original (seção 20) deixava preparado
+pra depois: uma visão agregada por mês em vez de só dia a dia. Seletor
+de mês (`<input type="month">`) soma, por profissional, todas as
+liquidações **fechadas** daquele mês — dias ainda em aberto não entram
+na soma (os valores deles não são confiáveis até fechar, ver seção
+Liquidação diária) e aparecem listados num aviso separado, pra ficar
+claro que o total do mês ainda não é definitivo enquanto algum dia
+estiver pendente.
+
 ## Recuperação de senha
 
 Link "¿Olvidó su contraseña?" na tela de login. Usa
@@ -281,6 +292,7 @@ src/
     waitlist/           # lista de espera, sugestões na Agenda
     payments/          # pagamentos pendentes (todas as datas)
     settlement/          # liquidação diária por profissional, ajustes, fechamento
+    reports/              # relatório mensal (soma das liquidações fechadas)
     settings/             # configuração de salas/profissionais por dia da semana
     myself/                # telas somente-leitura do login de profissional
     users/            # painel de usuários (admin)
