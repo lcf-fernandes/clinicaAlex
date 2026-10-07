@@ -182,6 +182,25 @@ navegador. Um `@media print` em `index.css` esconde a sidebar, os
 botões de navegação e os controles interativos do banner de ausência,
 e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
 
+## Responsividade
+
+Três faixas:
+- **Desktop largo**: `.main` fica centralizado (antes ficava colado à
+  esquerda com um vão em branco à direita em monitores grandes).
+- **≤1024px** (laptop pequeno/tablet): sidebar mais estreita, menos
+  padding, formulários com lista ao lado (`layout-split`) empilham em
+  vez de ficar espremidos.
+- **≤640px** (celular): sidebar vira uma barra horizontal no topo
+  (nome do usuário some pra caber mais, o resto continua ali, só mais
+  compacto); tabelas ganham scroll horizontal próprio em vez de
+  espremer colunas; modais ocupam a largura toda; campos lado a lado
+  em formulários empilham.
+
+A grade da Agenda em si não muda de estrutura — ela já tinha scroll
+horizontal próprio (`.agenda-scroll`) desde a Fase 2, então continua
+funcionando igual em qualquer largura, só rola mais num celular com
+muitos profissionais no mesmo dia.
+
 ## Reporte mensual
 
 Resolve o que a especificação original (seção 20) deixava preparado
