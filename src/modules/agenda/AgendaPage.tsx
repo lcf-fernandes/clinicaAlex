@@ -279,23 +279,11 @@ export default function AgendaPage() {
                   );
                 }
 
-                const block = profBlocks.find(
-                  (b) => tMin >= timeToMinutes(b.startTime) && tMin < timeToMinutes(b.endTime)
-                );
-                if (block) {
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      className="agenda-cell agenda-cell-blocked"
-                      style={{ gridRow, gridColumn }}
-                      onClick={() => handleRemoveBlock(block)}
-                    >
-                      Bloqueado{block.reason ? ` — ${block.reason}` : ""}
-                    </button>
-                  );
-                }
-
+                // Sessão checada ANTES de bloqueio — por mais que a
+                // criação de um bloqueio já valide contra sessões
+                // existentes, uma sessão nunca deve ficar escondida
+                // atrás de um bloqueio na grade (defesa extra contra
+                // dado antigo ou qualquer inconsistência futura).
                 const session = profSessions.find((s) => s.startTime === t);
                 if (session) {
                   const span = session.durationMinutes / 30;
@@ -312,6 +300,23 @@ export default function AgendaPage() {
                         {STATUS_LABELS[session.status]}
                         {session.scheduledProfessionalName && ` · reemplazo de ${session.scheduledProfessionalName}`}
                       </span>
+                    </button>
+                  );
+                }
+
+                const block = profBlocks.find(
+                  (b) => tMin >= timeToMinutes(b.startTime) && tMin < timeToMinutes(b.endTime)
+                );
+                if (block) {
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      className="agenda-cell agenda-cell-blocked"
+                      style={{ gridRow, gridColumn }}
+                      onClick={() => handleRemoveBlock(block)}
+                    >
+                      Bloqueado{block.reason ? ` — ${block.reason}` : ""}
                     </button>
                   );
                 }
@@ -365,6 +370,8 @@ export default function AgendaPage() {
         <BlockModal
           date={date}
           professionals={columns.map((c) => c.professional)}
+          sessions={sessions}
+          blocks={blocks}
           onSave={async (input) => {
             await addBlock(input);
           }}

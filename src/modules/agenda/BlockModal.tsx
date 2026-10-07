@@ -1,12 +1,15 @@
 import { useState } from "react";
 import type { Professional } from "../../types/professional";
-import type { BlockInput } from "../../types/session";
+import { rangesOverlap, timeToMinutes, type Block, type BlockInput, type Session } from "../../types/session";
 
 interface Props {
   date: string;
   professionals: Professional[];
   defaultProfessionalId?: string;
   defaultStartTime?: string;
+  /** Sessões e bloqueios já existentes nesse dia (todos os profissionais) — usados pra checar conflito. */
+  sessions: Session[];
+  blocks: Block[];
   onSave: (input: BlockInput) => Promise<void>;
   onClose: () => void;
 }
@@ -16,6 +19,8 @@ export default function BlockModal({
   professionals,
   defaultProfessionalId,
   defaultStartTime,
+  sessions,
+  blocks,
   onSave,
   onClose,
 }: Props) {
@@ -46,6 +51,27 @@ export default function BlockModal({
       setError("El horario final tiene que ser después del inicial.");
       return;
     }
+
+    const durationMinutes = timeToMinutes(endTime) - timeToMinutes(startTime);
+    const conflictingSession = sessions.find(
+      (s) => s.professionalId === professionalId && rangesOverlap(startTime, durationMinutes, s.startTime, s.durationMinutes)
+    );
+    if (conflictingSession) {
+      setError(
+        `Ese horario tiene conflicto con la sesión de ${conflictingSession.patientName} a las ${conflictingSession.startTime}. Reasigne o cancele esa sesión antes de bloquear.`
+      );
+      return;
+    }
+    const conflictingBlock = blocks.find(
+      (b) =>
+        b.professionalId === professionalId &&
+        rangesOverlap(startTime, durationMinutes, b.startTime, timeToMinutes(b.endTime) - timeToMinutes(b.startTime))
+    );
+    if (conflictingBlock) {
+      setError(`Ese horario ya está bloqueado${conflictingBlock.reason ? ` ("${conflictingBlock.reason}")` : ""}.`);
+      return;
+    }
+
     setSaving(true);
     setError(null);
     try {
