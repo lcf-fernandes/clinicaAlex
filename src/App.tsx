@@ -35,14 +35,14 @@ const SECTIONS: { key: Section; label: string }[] = [
 
 export default function App() {
   const [section, setSection] = useState<Section>("agenda");
-  const { user, profile, loading, signIn, signOut } = useAuth();
+  const { user, profile, loading, signIn, signOut, resetPasswordByUsername } = useAuth();
 
   if (loading) {
     return <div className="app-loading">Cargando...</div>;
   }
 
   if (!user) {
-    return <LoginPage onSignIn={signIn} />;
+    return <LoginPage onSignIn={signIn} onResetPassword={resetPasswordByUsername} />;
   }
 
   if (profile?.role === "professional") {

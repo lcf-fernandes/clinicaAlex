@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User,
@@ -56,7 +57,7 @@ export function useAuth() {
   async function signIn(username: string, password: string) {
     const email = await resolveEmailFromUsername(username.trim());
     if (!email) {
-      throw new Error("Usuário ou senha inválidos.");
+      throw new Error("Usuario o contraseña inválidos.");
     }
 
     // 1. Autentica no Firebase
@@ -68,11 +69,11 @@ export function useAuth() {
     // 4. Sem cadastro ou usuário desativado: desfaz o login e avisa
     if (!loadedProfile) {
       await firebaseSignOut(auth);
-      throw new Error("Usuário não possui cadastro no sistema.");
+      throw new Error("El usuario no tiene una cuenta registrada en el sistema.");
     }
     if (!loadedProfile.active) {
       await firebaseSignOut(auth);
-      throw new Error("Usuário desativado.");
+      throw new Error("Usuario deshabilitado.");
     }
     // onAuthStateChanged (acima) vai disparar em seguida e preencher
     // `user`/`profile` normalmente, então não precisamos repetir aqui.
@@ -82,5 +83,23 @@ export function useAuth() {
     await firebaseSignOut(auth);
   }
 
-  return { user, profile, loading, signIn, signOut };
+  /**
+   * Mesma resolução usuário→e-mail do login, mas pra disparar o
+   * e-mail de redefinição de senha do próprio Firebase Auth — não
+   * depende de admin nem de mexer no Console. Por segurança, não
+   * revela se o usuário existe ou não (sempre "sucesso" do ponto de
+   * vista da pessoa que pediu).
+   */
+  async function resetPasswordByUsername(username: string) {
+    const email = await resolveEmailFromUsername(username.trim());
+    if (!email) return;
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch {
+      // auth/user-not-found etc. — não propaga, mesmo comportamento
+      // de "sucesso silencioso" de quando o usuário não existe.
+    }
+  }
+
+  return { user, profile, loading, signIn, signOut, resetPasswordByUsername };
 }

@@ -182,6 +182,20 @@ navegador. Um `@media print` em `index.css` esconde a sidebar, os
 botões de navegação e os controles interativos do banner de ausência,
 e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
 
+## Recuperação de senha
+
+Link "¿Olvidó su contraseña?" na tela de login. Usa
+`sendPasswordResetEmail` nativo do Firebase Auth — não depende de
+admin nem do Console. Resolve usuário → e-mail do mesmo jeito que o
+login (`usernames/{username}`), e sempre mostra a mesma mensagem de
+sucesso, exista ou não aquele usuário, pra não revelar quais contas
+existem.
+
+Isso usa o e-mail padrão de redefinição de senha que o Firebase já
+manda sozinho — não precisa configurar nada extra no projeto pra
+funcionar, mas vale testar uma vez pra confirmar que o e-mail chega
+(às vezes cai em spam).
+
 ## Usuários
 
 Autenticação é por **usuário** (não e-mail) — o app resolve usuário →
