@@ -7,6 +7,7 @@ pacientes, pagamentos, pacientes fixos, reemplazos e liquidação diária.
 
 - [`docs/especificacao-original.pdf`](docs/especificacao-original.pdf) — especificação funcional original.
 - [`docs/arquitetura-app-clinica.md`](docs/arquitetura-app-clinica.md) — arquitetura, modelo de dados (Firestore) e roadmap de fases.
+- [`docs/manual-de-usuario.md`](docs/manual-de-usuario.md) — manual de usuário em espanhol, por papel (secretaria, admin, profissional). Rascunho em revisão; depois vira PDF.
 
 ## Status
 
