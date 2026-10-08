@@ -79,9 +79,9 @@ Cada turno agendado es una **sesión**. Dura **60 minutos** por defecto; tambié
 se puede registrar una **sesión doble de 120 minutos**. El sistema no deja
 agendar dos sesiones que se pisen en el mismo profesional.
 
-> **Importante:** en la grilla, los horarios se muestran cada 30 minutos.
-> Agende siempre a una hora **en punto o y media** (08:00, 08:30, 09:00…).
-> Un horario como 08:15 no se muestra correctamente en la grilla.
+Una sesión puede empezar a **cualquier hora**, en múltiplos de 5 minutos
+(por ejemplo 08:00, 08:30 o 09:15). La grilla muestra las filas cada 30 minutos,
+pero la sesión aparece exactamente desde su hora de inicio.
 
 ### Estado de la sesión
 
@@ -89,8 +89,11 @@ agendar dos sesiones que se pisen en el mismo profesional.
 |---|---|
 | **Agendado** | El turno está reservado, todavía no ocurrió. Es el estado inicial. |
 | **Asistió** | El paciente vino. **Solo estas sesiones cuentan para la liquidación.** |
-| **Canceló — avisó** | El paciente avisó con anticipación que no viene. |
-| **No asistió — sin aviso** | El paciente faltó y no avisó. |
+| **Canceló — avisó** | El paciente avisó con anticipación que no viene. **Libera el horario.** |
+| **No asistió — sin aviso** | El paciente faltó y no avisó. **Libera el horario.** |
+
+Las sesiones *Canceló* y *No asistió* **dejan el horario libre** para agendar a
+otro paciente, y su registro **se conserva** en el historial del paciente.
 
 ### Forma de pago
 
@@ -132,7 +135,10 @@ arriba muestra la fecha que está mirando.
 
 **Cómo leer la grilla:**
 
-- **Disponible** — horario libre; haga clic para agendar.
+- **Disponible** — horario libre; haga clic para agendar. Si en ese horario hubo
+  una sesión cancelada o una falta sin aviso, debajo de *Disponible* aparece una
+  línea chica con el estado y el nombre (por ejemplo *Canceló — avisó: Julio
+  Medina*), y un botón **✎** para editar ese registro.
 - **Casilla con el nombre del paciente** — sesión agendada. El color indica el
   estado (verde: asistió; tono neutro: agendado; amarillo: canceló; rojo: no asistió).
 - **Bloqueado** — horario bloqueado (se muestra el motivo si lo hay).
@@ -162,23 +168,34 @@ elegirla en un clic (ver [Lista de espera](#lista-de-espera)).
    Si todavía no pagó, elija **Pendiente** y deje el monto que debe.
 4. Presione **Guardar**.
 
-#### Cancelaciones y faltas: liberar el horario
+#### Cancelaciones y faltas
 
-Una sesión *Canceló — avisó* o *No asistió — sin aviso* **sigue ocupando el
-horario** en la grilla. Si otro paciente va a tomar ese turno:
+Cuando un paciente **avisa que no viene**, o **falta sin avisar**:
 
-1. Haga clic sobre la sesión cancelada y presione **Eliminar**.
-2. Agende al nuevo paciente.
+1. Haga clic sobre la sesión.
+2. Cambie el **Estado** a **Canceló — avisó** o **No asistió — sin aviso**.
+3. Presione **Guardar**.
 
-> **Atención:** al eliminar una sesión, esta **desaparece del historial del
-> paciente**. Queda anotada en el *Historial de acciones* (lo ve el
-> administrador), pero ya no figura en las estadísticas del paciente. Si solo
-> quiere dejar constancia de la falta y el horario no se va a reutilizar, **no la
-> elimine**: déjela con su estado.
+El horario queda **libre al instante**: en la grilla pasa a mostrarse como
+**Disponible**, con una línea chica que recuerda quién canceló. Si otro paciente
+toma ese turno, simplemente haga clic en el horario y agéndelo con normalidad.
+
+El registro de la cancelación o de la falta **no se pierde**: queda en el
+historial del paciente aunque otro paciente use el horario después. Si el horario
+fue ocupado por otra sesión, la cancelada deja de verse en la grilla (pero sigue
+en el historial).
+
+Para corregir una sesión cancelada (por ejemplo, el paciente finalmente vino),
+haga clic en el botón **✎** de la casilla *Disponible* y cambie el estado. Si el
+horario ya fue ocupado por otro paciente, la sesión cancelada ya no se ve en la
+grilla y no se puede reactivar desde ahí.
 
 #### Eliminar una sesión por error
 
-Haga clic sobre la sesión → **Eliminar** → confirme. El horario queda disponible.
+Haga clic sobre la sesión → **Eliminar** → confirme. El horario queda disponible y
+la sesión **desaparece también del historial del paciente**. Úselo solo cuando la
+sesión se cargó por error; para una cancelación real, use el estado *Canceló —
+avisó*.
 
 #### Bloquear un horario
 
@@ -187,8 +204,9 @@ Haga clic sobre la sesión → **Eliminar** → confirme. El horario queda dispo
    (por ejemplo *Almuerzo* o *Retiro*).
 3. Presione **Bloquear**.
 
-El sistema **no deja bloquear** un horario donde ya hay una sesión: primero
-cancele, elimine o transfiera esa sesión.
+El sistema **no deja bloquear** un horario donde ya hay una sesión agendada o
+realizada: primero cancele, elimine o transfiera esa sesión. Las sesiones
+canceladas no molestan.
 
 Para **quitar un bloqueo**, haga clic sobre la casilla *Bloqueado* y confirme.
 
@@ -204,7 +222,7 @@ Qué pasa después:
 - La columna del profesional ausente **desaparece** de la grilla ese día.
 - Si eligió un reemplazo, aparece su columna usando el horario del ausente.
 - Arriba aparece un **aviso** con cada paciente que estaba agendado con el
-  ausente. **Para cada uno decida por separado:**
+  ausente (las sesiones ya canceladas no aparecen). **Para cada uno decida por separado:**
   - **Transferir** a un profesional (puede ser el reemplazo u otro).
   - **Cancelar sesión.**
   - Dejarlo en *— mantener pendiente —* si todavía no se decidió (por ejemplo,
@@ -461,9 +479,11 @@ Cambie de día con **← Anterior**, **Hoy** y **Siguiente →**.
 ### Mi Liquidación
 
 Muestra su liquidación del día: sesiones, bruto, descuentos (sala, tasas y
-ajustes) y **A recibir**. Indica si está **Cerrada** o **todavía abierta**. Mientras esté abierta, los
-valores aún no son definitivos (pueden verse en cero o incompletos); los finales
-aparecen cuando la secretaria la cierra.
+ajustes) y **A recibir**. **Solo se muestra cuando la secretaria ya la cerró**, porque
+recién ahí los valores son definitivos.
+
+Mientras la liquidación está abierta, aparece el aviso *“La liquidación de este
+día todavía está abierta”*.
 
 Si aparece *“Liquidación todavía no disponible para este día”*, significa que la
 secretaria aún no la trabajó. Consulte con ella.
@@ -477,12 +497,13 @@ Probablemente todavía no está cargado. Créelo en **Pacientes** y vuelva a la
 agenda.
 
 **El sistema dice que el horario tiene conflicto.**
-Ya existe una sesión o un bloqueo en ese rango. Mire la grilla; si es una
-sesión cancelada que debe liberarse, elimínela (ver [Cancelaciones y
-faltas](#cancelaciones-y-faltas-liberar-el-horario)).
+Ya existe una sesión (agendada o realizada) o un bloqueo en ese rango. Mire la
+grilla. Las sesiones canceladas o con falta sin aviso **no** generan conflicto (ver
+[Cancelaciones y faltas](#cancelaciones-y-faltas)).
 
 **No puedo bloquear un horario.**
-Hay una sesión agendada ahí. Cancélela, elimínela o transfiérala primero.
+Hay una sesión agendada o realizada ahí. Cancélela (cambiando su estado),
+transfiérala o, si fue un error, elimínela primero.
 
 **Un profesional no aparece en la agenda de hoy.**
 Revise que esté **Activo**, que tenga ese día marcado en su **Horario semanal
