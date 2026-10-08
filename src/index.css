@@ -806,3 +806,69 @@ button.agenda-cell {
     padding: 16px;
   }
 }
+
+/* Grade com linhas de 5 min: sessões e bloqueios ficam por cima do fundo */
+.agenda-session {
+  z-index: 2;
+}
+
+.agenda-block {
+  z-index: 1;
+  line-height: 1.1;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Horário livre onde havia uma sessão cancelada / falta sem aviso */
+.agenda-cell-freed {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 0;
+}
+
+.agenda-cell-freed .freed-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  padding: 0 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.agenda-cell-freed .freed-main small {
+  font-size: 10px;
+  color: #8a6a2f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-cell-freed .freed-main:hover {
+  color: var(--primary);
+}
+
+.agenda-cell-freed .freed-edit {
+  flex: 0 0 24px;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 0;
+}
+
+@media print {
+  .agenda-cell-freed .freed-main small {
+    color: #666;
+  }
+  .agenda-cell-freed .freed-edit {
+    display: none !important;
+  }
+}

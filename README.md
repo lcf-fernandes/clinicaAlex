@@ -214,6 +214,23 @@ Não registrado (por escolha, pra manter o escopo enxuto): CRUD de
 profissionais/pacientes, bloqueios de horário, pacientes fixos, lista
 de espera. Dá pra estender chamando `logActivity` nesses hooks.
 
+## Agenda: horários livres e cancelamentos
+
+- **Cancelada / falta sem aviso libera o horário** (item 8 da
+  especificação): `occupiesSlot()` em `types/session.ts` — só
+  `agendado` e `asistio` ocupam. O horário aparece como "Disponible"
+  com uma linha pequena mostrando quem cancelou (e um ✎ pra editar o
+  registro); outro paciente pode ser agendado ali sem apagar nada, e o
+  registro continua no historial do paciente. Se outra sessão ocupa o
+  horário, a cancelada deixa de aparecer na grade mas segue no historial.
+- **Sessão pode começar em qualquer minuto múltiplo de 5** (ex. 09:15):
+  a grade tem uma linha a cada 5 min (6 linhas = uma casinha de 30 min)
+  e sessões/bloqueios são posicionados por cima do fundo pelo minuto
+  exato, em vez de depender de bater com uma linha de 30 em 30.
+- **Mi Liquidación (profissional) só mostra valores quando fechada**:
+  o documento aberto só guarda os ajustes, os valores calculados são
+  gravados no fechamento.
+
 ## Exportar datos (CSV)
 
 Seção "Exportar datos" (só admin) baixa três arquivos CSV pra abrir

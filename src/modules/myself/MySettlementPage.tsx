@@ -40,11 +40,14 @@ export default function MySettlementPage({ professionalId }: Props) {
         <div className="empty-state">
           Liquidación todavía no disponible para este día — hable con la secretaria.
         </div>
+      ) : !settlement.closedAt ? (
+        <div className="empty-state">
+          La liquidación de este día todavía está abierta. Los valores definitivos aparecen cuando la
+          secretaria la cierra.
+        </div>
       ) : (
         <div className="panel" style={{ maxWidth: 420 }}>
-          <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--text-muted)" }}>
-            {settlement.closedAt ? "Cerrada" : "Todavía abierta — los valores pueden cambiar"}
-          </p>
+          <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--text-muted)" }}>Cerrada</p>
           <table>
             <tbody>
               <tr>

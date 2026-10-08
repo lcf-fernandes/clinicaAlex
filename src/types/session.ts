@@ -43,6 +43,16 @@ export interface Block {
 
 export type BlockInput = Omit<Block, "id" | "createdAt">;
 
+/**
+ * Canceló (avisó) e No asistió (sin aviso) LIBERAM o horário: o registro
+ * fica pro histórico do paciente, mas não bloqueia outra sessão nem
+ * conta pra conflito (item 8 da especificação). Só "agendado" e
+ * "asistio" ocupam de fato o horário.
+ */
+export function occupiesSlot(status: SessionStatus): boolean {
+  return status !== "cancelo_aviso" && status !== "no_asistio_sin_aviso";
+}
+
 export const STATUS_LABELS: Record<SessionStatus, string> = {
   agendado: "Agendado",
   asistio: "Asistió",

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Weekday } from "../../types/professional";
 import type { RecurringRule } from "../../types/recurringRule";
-import { rangesOverlap, timeToMinutes, type Block, type Session, type SessionInput } from "../../types/session";
+import { occupiesSlot, rangesOverlap, timeToMinutes, type Block, type Session, type SessionInput } from "../../types/session";
 
 interface Params {
   date: string;
@@ -74,7 +74,10 @@ export function useAutoGenerateRecurringSessions({
         // cima, deixa pra ela resolver na mão.
         const conflict =
           sessions.some(
-            (s) => s.professionalId === professionalId && rangesOverlap(startTime, 60, s.startTime, s.durationMinutes)
+            (s) =>
+              occupiesSlot(s.status) &&
+              s.professionalId === professionalId &&
+              rangesOverlap(startTime, 60, s.startTime, s.durationMinutes)
           ) ||
           blocks.some(
             (b) =>

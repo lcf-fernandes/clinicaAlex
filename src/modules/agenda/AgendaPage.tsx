@@ -12,8 +12,24 @@ import BlockModal from "./BlockModal";
 import AbsenceModal from "./AbsenceModal";
 import AbsentProfessionalBanner from "./AbsentProfessionalBanner";
 import { addDays, formatLongDate, todayISO, weekdayOf } from "../../shared/date";
-import { minutesToTime, timeToMinutes, STATUS_LABELS, type Session, type Block } from "../../types/session";
+import {
+  minutesToTime,
+  occupiesSlot,
+  rangesOverlap,
+  timeToMinutes,
+  STATUS_LABELS,
+  type Session,
+  type Block,
+} from "../../types/session";
 import type { Professional } from "../../types/professional";
+
+// A grade tem uma linha a cada 5 minutos (6 linhas = uma casinha de 30min),
+// pra uma sessão poder começar em qualquer horário (ex.: 09:15) sem
+// "sumir" por não bater com uma linha de 30 em 30.
+const SLOT_MIN = 30;
+const ROW_MIN = 5;
+const ROWS_PER_SLOT = SLOT_MIN / ROW_MIN;
+const ROW_PX = 5;
 
 interface SessionModalState {
   professional: Professional;
@@ -157,7 +173,10 @@ export default function AgendaPage() {
   const occupied = useMemo(() => {
     if (!sessionModal) return [];
     const profSessions = sessions.filter(
-      (s) => s.professionalId === sessionModal.professional.id && s.id !== sessionModal.existing?.id
+      (s) =>
+        s.professionalId === sessionModal.professional.id &&
+        s.id !== sessionModal.existing?.id &&
+        occupiesSlot(s.status)
     );
     const profBlocks = blocks.filter((b) => b.professionalId === sessionModal.professional.id);
     return [
@@ -212,7 +231,7 @@ export default function AgendaPage() {
         <AbsentProfessionalBanner
           key={ex.id}
           exception={ex}
-          sessions={sessions.filter((s) => s.professionalId === ex.professionalId)}
+          sessions={sessions.filter((s) => s.professionalId === ex.professionalId && occupiesSlot(s.status))}
           replacementOptions={professionals.filter((p) => p.active && p.id !== ex.professionalId)}
           onReassign={handleReassign}
           onCancelSession={handleCancelSession}
@@ -232,7 +251,7 @@ export default function AgendaPage() {
             className="agenda-grid"
             style={{
               gridTemplateColumns: `72px repeat(${columns.length}, minmax(170px, 1fr))`,
-              gridTemplateRows: `44px repeat(${slots.length}, 30px)`,
+              gridTemplateRows: `44px repeat(${slots.length * ROWS_PER_SLOT}, ${ROW_PX}px)`,
             }}
           >
             <div className="agenda-corner" style={{ gridRow: 1, gridColumn: 1 }} />
@@ -242,88 +261,83 @@ export default function AgendaPage() {
               </div>
             ))}
 
-            {slots.map((t, rowIdx) => (
-              <div className="agenda-time-label" key={t} style={{ gridRow: rowIdx + 2, gridColumn: 1 }}>
+            {slots.map((t, slotIdx) => (
+              <div
+                className="agenda-time-label"
+                key={t}
+                style={{ gridRow: `${slotIdx * ROWS_PER_SLOT + 2} / span ${ROWS_PER_SLOT}`, gridColumn: 1 }}
+              >
                 {t.endsWith(":00") ? t : ""}
               </div>
             ))}
 
             {columns.map((col, colIdx) => {
               const prof = col.professional;
-              const daySchedule = col.schedule;
+              const gridColumn = colIdx + 2;
+              const schedStart = timeToMinutes(col.schedule.start);
+              const schedEnd = timeToMinutes(col.schedule.end);
+              const gridStartMin = timeToMinutes(slots[0]);
+              const gridEndMin = gridStartMin + slots.length * SLOT_MIN;
+              const rowOf = (min: number) => Math.round((min - gridStartMin) / ROW_MIN) + 2;
+
               const profSessions = sessions.filter((s) => s.professionalId === prof.id);
+              const activeSessions = profSessions.filter((s) => occupiesSlot(s.status));
+              const freedSessions = profSessions.filter((s) => !occupiesSlot(s.status));
               const profBlocks = blocks.filter((b) => b.professionalId === prof.id);
-              const continuationSlots = new Set<string>();
-              profSessions.forEach((s) => {
-                const startMin = timeToMinutes(s.startTime);
-                const span = s.durationMinutes / 30;
-                for (let k = 1; k < span; k++) continuationSlots.add(minutesToTime(startMin + k * 30));
-              });
+              const blockDuration = (b: Block) => timeToMinutes(b.endTime) - timeToMinutes(b.startTime);
 
-              return slots.map((t, rowIdx) => {
-                if (continuationSlots.has(t)) return null;
-
-                const gridRow = rowIdx + 2;
-                const gridColumn = colIdx + 2;
+              // Camada de fundo: uma casinha por 30min (fora do expediente,
+              // coberta por algo, ou disponível pra clicar).
+              const background = slots.map((t, slotIdx) => {
                 const tMin = timeToMinutes(t);
+                const gridRow = `${slotIdx * ROWS_PER_SLOT + 2} / span ${ROWS_PER_SLOT}`;
 
-                const outside =
-                  tMin < timeToMinutes(daySchedule.start) || tMin >= timeToMinutes(daySchedule.end);
-                if (outside) {
+                if (tMin + SLOT_MIN <= schedStart || tMin >= schedEnd) {
+                  return (
+                    <div key={`bg-${t}`} className="agenda-cell agenda-cell-outside" style={{ gridRow, gridColumn }} />
+                  );
+                }
+
+                const covered =
+                  activeSessions.some((s) => rangesOverlap(t, SLOT_MIN, s.startTime, s.durationMinutes)) ||
+                  profBlocks.some((b) => rangesOverlap(t, SLOT_MIN, b.startTime, blockDuration(b)));
+                if (covered) {
+                  return <div key={`bg-${t}`} className="agenda-cell" style={{ gridRow, gridColumn }} />;
+                }
+
+                // Sessão cancelada / faltou sem aviso: o horário está livre,
+                // mas o registro continua visível aqui (e editável).
+                const freed = freedSessions.find(
+                  (s) => timeToMinutes(s.startTime) >= tMin && timeToMinutes(s.startTime) < tMin + SLOT_MIN
+                );
+                if (freed) {
                   return (
                     <div
-                      key={t}
-                      className="agenda-cell agenda-cell-outside"
+                      key={`bg-${t}`}
+                      className="agenda-cell agenda-cell-available agenda-cell-freed"
                       style={{ gridRow, gridColumn }}
-                    />
-                  );
-                }
-
-                // Sessão checada ANTES de bloqueio — por mais que a
-                // criação de um bloqueio já valide contra sessões
-                // existentes, uma sessão nunca deve ficar escondida
-                // atrás de um bloqueio na grade (defesa extra contra
-                // dado antigo ou qualquer inconsistência futura).
-                const session = profSessions.find((s) => s.startTime === t);
-                if (session) {
-                  const span = session.durationMinutes / 30;
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      className={`agenda-cell agenda-session status-${session.status}`}
-                      style={{ gridRow: `${gridRow} / span ${span}`, gridColumn }}
-                      onClick={() => openEdit(prof, session)}
                     >
-                      <strong>{session.patientName}</strong>
-                      <span>
-                        {STATUS_LABELS[session.status]}
-                        {session.scheduledProfessionalName && ` · reemplazo de ${session.scheduledProfessionalName}`}
-                      </span>
-                    </button>
-                  );
-                }
-
-                const block = profBlocks.find(
-                  (b) => tMin >= timeToMinutes(b.startTime) && tMin < timeToMinutes(b.endTime)
-                );
-                if (block) {
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      className="agenda-cell agenda-cell-blocked"
-                      style={{ gridRow, gridColumn }}
-                      onClick={() => handleRemoveBlock(block)}
-                    >
-                      Bloqueado{block.reason ? ` — ${block.reason}` : ""}
-                    </button>
+                      <button type="button" className="freed-main" onClick={() => openCreate(prof, t)}>
+                        <span>Disponible</span>
+                        <small>
+                          {STATUS_LABELS[freed.status]}: {freed.patientName}
+                        </small>
+                      </button>
+                      <button
+                        type="button"
+                        className="freed-edit"
+                        title="Editar la sesión cancelada"
+                        onClick={() => openEdit(prof, freed)}
+                      >
+                        ✎
+                      </button>
+                    </div>
                   );
                 }
 
                 return (
                   <button
-                    key={t}
+                    key={`bg-${t}`}
                     type="button"
                     className="agenda-cell agenda-cell-available"
                     style={{ gridRow, gridColumn }}
@@ -333,6 +347,58 @@ export default function AgendaPage() {
                   </button>
                 );
               });
+
+              // Camada de cima: bloqueios e sessões posicionados pelo minuto
+              // exato de início/fim, sobrepondo o fundo. Sessão fica acima
+              // do bloqueio (uma sessão nunca fica escondida atrás de um).
+              const overlay = (
+                startMin: number,
+                endMin: number
+              ): { gridRow: string; gridColumn: number } | null => {
+                const startRow = rowOf(Math.max(startMin, gridStartMin));
+                const endRow = rowOf(Math.min(endMin, gridEndMin));
+                if (endRow <= startRow) return null;
+                return { gridRow: `${startRow} / ${endRow}`, gridColumn };
+              };
+
+              const blockCells = profBlocks.map((b) => {
+                const style = overlay(timeToMinutes(b.startTime), timeToMinutes(b.endTime));
+                if (!style) return null;
+                return (
+                  <button
+                    key={`b-${b.id}`}
+                    type="button"
+                    className="agenda-cell agenda-cell-blocked agenda-block"
+                    style={style}
+                    onClick={() => handleRemoveBlock(b)}
+                  >
+                    Bloqueado{b.reason ? ` — ${b.reason}` : ""}
+                  </button>
+                );
+              });
+
+              const sessionCells = activeSessions.map((s) => {
+                const startMin = timeToMinutes(s.startTime);
+                const style = overlay(startMin, startMin + s.durationMinutes);
+                if (!style) return null;
+                return (
+                  <button
+                    key={`s-${s.id}`}
+                    type="button"
+                    className={`agenda-cell agenda-session status-${s.status}`}
+                    style={style}
+                    onClick={() => openEdit(prof, s)}
+                  >
+                    <strong>{s.patientName}</strong>
+                    <span>
+                      {STATUS_LABELS[s.status]}
+                      {s.scheduledProfessionalName && ` · reemplazo de ${s.scheduledProfessionalName}`}
+                    </span>
+                  </button>
+                );
+              });
+
+              return [...background, ...blockCells, ...sessionCells];
             })}
           </div>
         </div>
@@ -370,7 +436,7 @@ export default function AgendaPage() {
         <BlockModal
           date={date}
           professionals={columns.map((c) => c.professional)}
-          sessions={sessions}
+          sessions={sessions.filter((s) => occupiesSlot(s.status))}
           blocks={blocks}
           onSave={async (input) => {
             await addBlock(input);

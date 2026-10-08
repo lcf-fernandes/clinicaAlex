@@ -21,10 +21,11 @@ function mapSettlement(_id: string, data: Record<string, unknown>): DailySettlem
 }
 
 /**
- * Só mostra a liquidação depois que a secretária/admin salvou algo
- * pra aquele dia (fechada ou com ajustes) — o profissional não tem
- * acesso à coleção `professionals` pra calcular um preview ao vivo
- * (ver firestore.rules), então sem o documento não dá pra saber.
+ * Devolve o documento do dia, se existir. Um documento ABERTO só guarda
+ * os ajustes (os valores calculados só são gravados no fechamento), então
+ * a tela só mostra números quando `closedAt` está preenchido — o
+ * profissional não tem acesso à coleção `professionals` pra calcular um
+ * preview ao vivo (ver firestore.rules).
  */
 export function useMySettlement(professionalId: string, date: string) {
   const [settlement, setSettlement] = useState<DailySettlement | null>(null);

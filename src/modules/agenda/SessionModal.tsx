@@ -4,7 +4,9 @@ import type { WaitlistEntry } from "../../types/waitlistEntry";
 import {
   PAYMENT_LABELS,
   STATUS_LABELS,
+  occupiesSlot,
   rangesOverlap,
+  timeToMinutes,
   type PaymentMethod,
   type Session,
   type SessionInput,
@@ -87,9 +89,16 @@ export default function SessionModal({
       setError("Seleccione un paciente de la lista.");
       return;
     }
-    const conflict = occupied.some((o) =>
-      rangesOverlap(startTime, durationMinutes, o.startTime, o.durationMinutes)
-    );
+    if (timeToMinutes(startTime) % 5 !== 0) {
+      setError("Use un horario en múltiplos de 5 minutos (por ejemplo 09:15).");
+      return;
+    }
+    // Cancelada / falta sin aviso não ocupa o horário, então não
+    // precisa checar conflito (e permite editar o registro mesmo que
+    // outro paciente já tenha tomado esse horário).
+    const conflict =
+      occupiesSlot(status) &&
+      occupied.some((o) => rangesOverlap(startTime, durationMinutes, o.startTime, o.durationMinutes));
     if (conflict) {
       setError("Ese horario tiene conflicto con otra sesión o bloqueo ya existente.");
       return;
@@ -195,6 +204,7 @@ export default function SessionModal({
             <input
               id="startTime"
               type="time"
+              step={300}
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
             />
