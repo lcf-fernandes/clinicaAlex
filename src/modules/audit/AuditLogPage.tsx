@@ -7,6 +7,7 @@ const ACTION_GROUPS: { value: string; label: string; prefix: string }[] = [
   { value: "payment", label: "Pagos", prefix: "payment." },
   { value: "settlement", label: "Liquidaciones", prefix: "settlement." },
   { value: "user", label: "Usuarios", prefix: "user." },
+  { value: "data", label: "Exportaciones", prefix: "data." },
 ];
 
 function formatDateTime(ms: number) {

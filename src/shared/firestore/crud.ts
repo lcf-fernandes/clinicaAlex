@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -77,4 +78,17 @@ export async function setDocById(
     ...data,
     updatedAt: serverTimestamp(),
   });
+}
+
+/**
+ * Busca única (sem assinatura em tempo real) devolvendo os dados crus
+ * de cada documento + o id — usado pelas exportações em CSV, que só
+ * precisam de uma foto do momento.
+ */
+export async function fetchRaw(
+  collectionName: string,
+  constraints: QueryConstraint[] = []
+): Promise<(Record<string, unknown> & { id: string })[]> {
+  const snapshot = await getDocs(query(collection(db, collectionName), ...constraints));
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 }

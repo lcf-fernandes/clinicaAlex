@@ -10,6 +10,7 @@ import MonthlyReportPage from "./modules/reports/MonthlyReportPage";
 import UsersPage from "./modules/users/UsersPage";
 import SettingsPage from "./modules/settings/SettingsPage";
 import AuditLogPage from "./modules/audit/AuditLogPage";
+import ExportPage from "./modules/export/ExportPage";
 import LoginPage from "./modules/auth/LoginPage";
 import ProfessionalApp from "./ProfessionalApp";
 import { useAuth } from "./shared/auth/useAuth";
@@ -25,6 +26,7 @@ type Section =
   | "reports"
   | "users"
   | "audit"
+  | "export"
   | "settings";
 
 const SECTIONS: { key: Section; label: string }[] = [
@@ -61,6 +63,7 @@ export default function App() {
     ...(isAdmin
       ? [
           { key: "audit" as const, label: "Historial de acciones" },
+          { key: "export" as const, label: "Exportar datos" },
           { key: "settings" as const, label: "Configuración" },
         ]
       : []),
@@ -102,6 +105,7 @@ export default function App() {
         {section === "reports" && <MonthlyReportPage />}
         {section === "users" && <UsersPage currentUid={user.uid} isAdmin={isAdmin} />}
         {section === "audit" && isAdmin && <AuditLogPage />}
+        {section === "export" && isAdmin && <ExportPage />}
         {section === "settings" && isAdmin && <SettingsPage />}
       </div>
     </div>

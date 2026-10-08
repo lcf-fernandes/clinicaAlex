@@ -213,6 +213,29 @@ Não registrado (por escolha, pra manter o escopo enxuto): CRUD de
 profissionais/pacientes, bloqueios de horário, pacientes fixos, lista
 de espera. Dá pra estender chamando `logActivity` nesses hooks.
 
+## Exportar datos (CSV)
+
+Seção "Exportar datos" (só admin) baixa três arquivos CSV pra abrir
+no Excel — serve de backup e pra análises que o app não faz (ex.:
+total faturado no ano):
+
+- **Pacientes**: lista completa (nome, telefone, facturación nome+RUC,
+  observações).
+- **Sesiones**: por período (de/até), com profissional, profissional
+  habitual em caso de reemplazo, estado, forma e valor de pagamento.
+- **Liquidaciones**: por período, só as **fechadas** (as abertas não
+  têm valores confiáveis).
+
+Detalhes técnicos que importam: separador `;` (com vírgula, o Excel em
+espanhol/português joga tudo numa coluna só) e BOM UTF-8 (senão os
+acentos saem quebrados). Valores monetários saem como inteiros, sem
+separador de milhar, pra o Excel somar direto. Cada exportação é
+registrada no Historial de acciones (`data.export`) — são dados
+sensíveis, vale saber quem baixou o quê.
+
+Exportação usa busca única (`fetchRaw` em `crud.ts`), não a assinatura
+em tempo real que o resto do app usa.
+
 ## Responsividade
 
 Três faixas:
@@ -344,6 +367,7 @@ src/
     settlement/          # liquidação diária por profissional, ajustes, fechamento
     reports/              # relatório mensal (soma das liquidações fechadas)
     audit/                 # histórico de ações (só admin lê)
+    export/                # exportação de pacientes/sessões/liquidações em CSV (admin)
     settings/             # configuração de salas/profissionais por dia da semana
     myself/                # telas somente-leitura do login de profissional
     users/            # painel de usuários (admin)
