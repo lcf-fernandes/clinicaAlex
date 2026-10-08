@@ -6,7 +6,12 @@ import {
   subscribeCollection,
   updateDocById,
 } from "../../shared/firestore/crud";
-import type { Session, SessionInput } from "../../types/session";
+import { logActivity } from "../../shared/audit/logActivity";
+import { PAYMENT_LABELS, STATUS_LABELS, type Session, type SessionInput } from "../../types/session";
+
+function fmtDate(iso: string) {
+  return iso.split("-").reverse().join("/");
+}
 
 const COLLECTION = "sessions";
 
@@ -53,15 +58,42 @@ export function useSessions(date: string) {
   }, [date]);
 
   async function addSession(input: SessionInput) {
-    return createDoc(COLLECTION, input);
+    const id = await createDoc(COLLECTION, input);
+    // Sessões geradas automaticamente de paciente fixo também passam
+    // por aqui — o resumo deixa isso claro.
+    logActivity(
+      input.recurringRuleId ? "session.auto_create" : "session.create",
+      `${input.recurringRuleId ? "Se generó automáticamente" : "Creó"} la sesión de ${input.patientName} con ${input.professionalName} (${input.startTime}, ${fmtDate(input.date)})`
+    );
+    return id;
   }
 
   async function updateSession(id: string, input: Partial<SessionInput>) {
-    return updateDocById(COLLECTION, id, input);
+    const before = sessions.find((s) => s.id === id);
+    await updateDocById(COLLECTION, id, input);
+    const patient = input.patientName ?? before?.patientName ?? "?";
+    const when = `${input.startTime ?? before?.startTime ?? "?"}, ${fmtDate(input.date ?? before?.date ?? date)}`;
+    const changes: string[] = [];
+    if (input.status && input.status !== before?.status) changes.push(`estado → ${STATUS_LABELS[input.status]}`);
+    if (input.payment && JSON.stringify(input.payment) !== JSON.stringify(before?.payment)) {
+      changes.push(`pago → ${PAYMENT_LABELS[input.payment.method]} ${input.payment.amount.toLocaleString("es-PY")} Gs`);
+    }
+    if (input.professionalName && input.professionalName !== before?.professionalName) {
+      changes.push(`profesional → ${input.professionalName}`);
+    }
+    logActivity(
+      "session.update",
+      `Editó la sesión de ${patient} (${when})${changes.length ? ": " + changes.join(", ") : ""}`
+    );
   }
 
   async function removeSession(id: string) {
-    return deleteDocById(COLLECTION, id);
+    const before = sessions.find((s) => s.id === id);
+    await deleteDocById(COLLECTION, id);
+    logActivity(
+      "session.delete",
+      `Eliminó la sesión de ${before?.patientName ?? "?"} con ${before?.professionalName ?? "?"} (${before?.startTime ?? "?"}, ${fmtDate(before?.date ?? date)})`
+    );
   }
 
   return { sessions, loading, error, addSession, updateSession, removeSession };

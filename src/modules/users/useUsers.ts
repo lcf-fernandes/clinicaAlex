@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { orderBy } from "firebase/firestore";
 import { deleteDocById, subscribeCollection, updateDocById } from "../../shared/firestore/crud";
 import { DEFAULT_PERMISSIONS, type UserProfile } from "../../types/user";
+import { logActivity } from "../../shared/audit/logActivity";
 
 const COLLECTION = "users";
 
@@ -44,7 +45,12 @@ export function useUsers() {
   async function setActive(uid: string, active: boolean) {
     // updateDocById escreve updatedAt via serverTimestamp(), o que é
     // inofensivo mesmo em documentos que não tinham esse campo antes.
-    return updateDocById(COLLECTION, uid, { active });
+    const target = users.find((u) => u.uid === uid);
+    await updateDocById(COLLECTION, uid, { active });
+    logActivity(
+      active ? "user.unblock" : "user.block",
+      `${active ? "Desbloqueó" : "Bloqueó"} al usuario ${target?.username ?? uid}`
+    );
   }
 
   async function removeUser(user: UserProfile) {
@@ -55,6 +61,7 @@ export function useUsers() {
     if (user.username) {
       await deleteDocById("usernames", user.username);
     }
+    logActivity("user.delete", `Eliminó el acceso del usuario ${user.username}`);
   }
 
   return { users, loading, error, setActive, removeUser };

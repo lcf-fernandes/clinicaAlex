@@ -106,6 +106,15 @@ service cloud.firestore {
       allow write: if isStaff();
     }
 
+    // Trilha de auditoria: staff só CRIA entradas (é quem gera as
+    // ações), só admin LÊ, e ninguém edita nem apaga — registro
+    // imutável pelo próprio app.
+    match /auditLog/{id} {
+      allow create: if isStaff();
+      allow read: if isSignedIn() && role() == 'admin';
+      allow update, delete: if false;
+    }
+
     // Documento único com a quantidade de salas por dia da semana.
     // Secretaria só lê (pro aviso de ocupação em Profissionais); só
     // admin edita, é uma decisão estrutural da clínica.

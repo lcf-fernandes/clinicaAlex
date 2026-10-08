@@ -9,6 +9,7 @@ import SettlementPage from "./modules/settlement/SettlementPage";
 import MonthlyReportPage from "./modules/reports/MonthlyReportPage";
 import UsersPage from "./modules/users/UsersPage";
 import SettingsPage from "./modules/settings/SettingsPage";
+import AuditLogPage from "./modules/audit/AuditLogPage";
 import LoginPage from "./modules/auth/LoginPage";
 import ProfessionalApp from "./ProfessionalApp";
 import { useAuth } from "./shared/auth/useAuth";
@@ -23,6 +24,7 @@ type Section =
   | "settlement"
   | "reports"
   | "users"
+  | "audit"
   | "settings";
 
 const SECTIONS: { key: Section; label: string }[] = [
@@ -56,7 +58,12 @@ export default function App() {
   const sections = [
     ...SECTIONS,
     { key: "users" as const, label: "Usuarios" },
-    ...(isAdmin ? [{ key: "settings" as const, label: "Configuración" }] : []),
+    ...(isAdmin
+      ? [
+          { key: "audit" as const, label: "Historial de acciones" },
+          { key: "settings" as const, label: "Configuración" },
+        ]
+      : []),
   ];
 
   return (
@@ -94,6 +101,7 @@ export default function App() {
         {section === "settlement" && <SettlementPage />}
         {section === "reports" && <MonthlyReportPage />}
         {section === "users" && <UsersPage currentUid={user.uid} isAdmin={isAdmin} />}
+        {section === "audit" && isAdmin && <AuditLogPage />}
         {section === "settings" && isAdmin && <SettingsPage />}
       </div>
     </div>

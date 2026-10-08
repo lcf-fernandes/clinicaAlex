@@ -182,6 +182,37 @@ navegador. Um `@media print` em `index.css` esconde a sidebar, os
 botões de navegação e os controles interativos do banner de ausência,
 e ajusta a grade pra caber em uma folha (sugere paisagem via `@page`).
 
+## Historial de acciones (auditoria)
+
+Seção "Historial de acciones" (só admin) lista as últimas 300 ações
+registradas, com filtro por tipo (sessões, pagamentos, liquidações,
+usuários) e busca por texto/usuário. Cada entrada guarda **quem**
+(`userId`/`username`), **quando** (`createdAt` do servidor) e um
+**resumo legível** já em espanhol.
+
+O que é registrado: criar/editar/apagar sessão (inclui mudança de
+estado, pagamento e profissional, e as sessões geradas automaticamente
+de paciente fixo), marcar pagamento pendente como pago, ajustes/fechar/
+reabrir liquidação, e criar/bloquear/desbloquear/apagar usuário.
+
+Como funciona: `logActivity()` (`src/shared/audit/`) é chamado nos
+próprios hooks de cada operação; o "ator" vem de `currentActor`, que o
+`useAuth` preenche quando o login muda. Falha de log nunca derruba a
+ação principal (só `console.warn`).
+
+**Limitação honesta:** sem Cloud Function no meio, o registro é feito
+pelo próprio navegador. As regras do Firestore impedem editar/apagar
+entradas (`update, delete: if false`) e só admin lê, mas não dá pra
+impedir que um usuário tecnicamente mal-intencionado deixe de gerar a
+entrada (ou crie uma falsa). Serve pra dirimir dúvidas do dia a dia
+entre secretaria e admin — pra auditoria à prova de adulteração, o log
+teria que ser gravado do lado do servidor (mesma pendência das Cloud
+Functions, plano Blaze).
+
+Não registrado (por escolha, pra manter o escopo enxuto): CRUD de
+profissionais/pacientes, bloqueios de horário, pacientes fixos, lista
+de espera. Dá pra estender chamando `logActivity` nesses hooks.
+
 ## Responsividade
 
 Três faixas:
@@ -312,6 +343,7 @@ src/
     payments/          # pagamentos pendentes (todas as datas)
     settlement/          # liquidação diária por profissional, ajustes, fechamento
     reports/              # relatório mensal (soma das liquidações fechadas)
+    audit/                 # histórico de ações (só admin lê)
     settings/             # configuração de salas/profissionais por dia da semana
     myself/                # telas somente-leitura do login de profissional
     users/            # painel de usuários (admin)

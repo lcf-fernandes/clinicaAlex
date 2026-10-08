@@ -3,6 +3,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { createAuthAccount } from "../../shared/auth/createAuthAccount";
 import { setDocById } from "../../shared/firestore/crud";
+import { logActivity } from "../../shared/audit/logActivity";
 import { useProfessionals } from "../professionals/useProfessionals";
 import { DEFAULT_PERMISSIONS, type UserRole } from "../../types/user";
 
@@ -68,6 +69,7 @@ export default function CreateUserForm({ allowedRoles, onCreated, onCancel }: Pr
           : {}),
       });
       await setDocById("usernames", cleanUsername, { email: email.trim(), uid });
+      logActivity("user.create", `Creó el usuario ${cleanUsername} (${ROLE_LABELS[role].split(" (")[0]})`);
 
       onCreated();
     } catch (err) {

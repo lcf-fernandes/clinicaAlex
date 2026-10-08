@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { serverTimestamp, where } from "firebase/firestore";
 import { setDocById, subscribeCollection } from "../../shared/firestore/crud";
+import { logActivity } from "../../shared/audit/logActivity";
 import type { DailySettlement, SettlementAdjustment, SettlementCalculation } from "../../types/settlement";
 
 const COLLECTION = "dailySettlements";
@@ -53,13 +54,17 @@ export function useSettlements(date: string) {
     professionalName: string,
     adjustments: SettlementAdjustment[]
   ) {
-    return setDocById(COLLECTION, docId(professionalId, date), {
+    await setDocById(COLLECTION, docId(professionalId, date), {
       professionalId,
       professionalName,
       date,
       adjustments,
       closedAt: null,
     });
+    logActivity(
+      "settlement.adjustments",
+      `Actualizó los ajustes de ${professionalName} (${date.split("-").reverse().join("/")}): ${adjustments.length} ajuste(s), total ${adjustments.reduce((s, a) => s + a.amount, 0).toLocaleString("es-PY")} Gs`
+    );
   }
 
   /** Grava o snapshot final (os números não mudam mais mesmo que a agenda seja corrigida depois). */
@@ -69,7 +74,7 @@ export function useSettlements(date: string) {
     adjustments: SettlementAdjustment[],
     calc: SettlementCalculation
   ) {
-    return setDocById(COLLECTION, docId(professionalId, date), {
+    await setDocById(COLLECTION, docId(professionalId, date), {
       professionalId,
       professionalName,
       date,
@@ -81,17 +86,25 @@ export function useSettlements(date: string) {
       netAmount: calc.netAmount,
       closedAt: serverTimestamp(),
     });
+    logActivity(
+      "settlement.close",
+      `Cerró la liquidación de ${professionalName} (${date.split("-").reverse().join("/")}): ${calc.sessionsCount} sesión(es), a recibir ${Math.round(calc.netAmount).toLocaleString("es-PY")} Gs`
+    );
   }
 
   /** Reabre pra corrigir — os valores voltam a ser recalculados ao vivo até fechar de novo. */
   async function reopenSettlement(professionalId: string, professionalName: string, adjustments: SettlementAdjustment[]) {
-    return setDocById(COLLECTION, docId(professionalId, date), {
+    await setDocById(COLLECTION, docId(professionalId, date), {
       professionalId,
       professionalName,
       date,
       adjustments,
       closedAt: null,
     });
+    logActivity(
+      "settlement.reopen",
+      `Reabrió la liquidación de ${professionalName} (${date.split("-").reverse().join("/")})`
+    );
   }
 
   return { settlements, loading, error, saveAdjustments, closeSettlement, reopenSettlement };

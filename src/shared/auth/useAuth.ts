@@ -9,6 +9,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { resolveEmailFromUsername } from "./usernameMap";
+import { setCurrentActor } from "../audit/currentActor";
 import { DEFAULT_PERMISSIONS, type UserProfile } from "../../types/user";
 
 export function useAuth() {
@@ -20,9 +21,12 @@ export function useAuth() {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        setProfile(await loadProfile(u.uid));
+        const loaded = await loadProfile(u.uid);
+        setProfile(loaded);
+        setCurrentActor({ uid: u.uid, username: loaded?.username || u.email || u.uid });
       } else {
         setProfile(null);
+        setCurrentActor(null);
       }
       setLoading(false);
     });

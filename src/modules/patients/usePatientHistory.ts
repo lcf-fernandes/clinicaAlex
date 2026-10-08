@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { where } from "firebase/firestore";
 import { subscribeCollection, updateDocById } from "../../shared/firestore/crud";
+import { logActivity } from "../../shared/audit/logActivity";
+import { PAYMENT_LABELS } from "../../types/session";
 import type { Session, SessionPayment } from "../../types/session";
 
 const COLLECTION = "sessions";
@@ -61,7 +63,12 @@ export function usePatientHistory(patientId: string | null) {
   }, [patientId]);
 
   async function markPaid(sessionId: string, payment: SessionPayment) {
-    return updateDocById(COLLECTION, sessionId, { payment });
+    const session = sessions.find((s) => s.id === sessionId);
+    await updateDocById(COLLECTION, sessionId, { payment });
+    logActivity(
+      "payment.mark_paid",
+      `Marcó como pagado: ${session?.patientName ?? "?"} (${session?.date.split("-").reverse().join("/") ?? "?"} ${session?.startTime ?? ""}) — ${PAYMENT_LABELS[payment.method]} ${payment.amount.toLocaleString("es-PY")} Gs`
+    );
   }
 
   return { sessions, loading, error, markPaid };
